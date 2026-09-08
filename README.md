@@ -2,6 +2,10 @@
 
 GitHub Pages로 공유하기 위한 정적 웹사이트 저장소입니다.
 
+## 공개 사이트
+
+https://pilgukang0704.github.io/ttmddash/
+
 ## 공개되는 내용
 
 - `docs/index.html`: 메인 아키텍처 화면
