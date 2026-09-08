@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Total Merchandising Dashboard — 예시 화면</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+<style>
+:root{
+  --bg:#f4f5f7;--card:#fff;--ink:#1d1d1f;--muted:#6e6e73;--muted2:#9a9aa0;--line:#e5e5ea;
+  --blue:#0071e3;--blue-d:#0b5bad;--green:#1a7f37;--orange:#e08700;--red:#e2264c;--purple:#7255e8;--pink:#d83a9e;
+  --font:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:14px;line-height:1.5;letter-spacing:-.01em;word-break:keep-all;-webkit-font-smoothing:antialiased}
+
+/* topbar */
+.topbar{position:fixed;inset:0 0 auto;height:56px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:16px;padding:0 22px;z-index:100}
+.tb-brand{display:flex;align-items:center;gap:10px;font-size:15px;white-space:nowrap}
+.tb-brand b{font-weight:800}
+.tb-brand span{color:var(--muted);font-weight:600}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:700;background:#eef4ff;color:var(--blue)}
+.chip.demo{background:#fff1f4;color:var(--red)}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:12px;color:var(--muted2);font-size:12px;white-space:nowrap}
+.dot-live{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;margin-right:5px}
+
+/* sidebar */
+.side{position:fixed;top:56px;bottom:0;left:0;width:218px;background:#fff;border-right:1px solid var(--line);padding:18px 12px;overflow-y:auto}
+.side a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:var(--muted);text-decoration:none;font-weight:600;font-size:13.5px;margin-bottom:2px}
+.side a .no{font-size:10.5px;font-weight:800;color:var(--muted2);width:20px}
+.side a.on{background:#0b1c30;color:#fff}
+.side a.on .no{color:#8fb4e8}
+.side a:not(.on):hover{background:#f2f3f5}
+.side .sep{margin:14px 10px 8px;font-size:10.5px;font-weight:800;letter-spacing:.1em;color:var(--muted2)}
+.side .help{margin-top:18px;padding:12px 14px;border-radius:12px;background:#f4f6f9;color:var(--muted);font-size:12px;line-height:1.55}
+
+/* main */
+.main{margin:56px 0 0 218px;padding:24px 26px 60px}
+.tab{display:none;max-width:1220px;margin:0 auto}
+.tab.on{display:block}
+.page-head{display:flex;align-items:baseline;gap:14px;margin:4px 0 18px;flex-wrap:wrap}
+.page-head h1{margin:0;font-size:22px;letter-spacing:-.03em}
+.page-head p{margin:0;color:var(--muted);font-size:13px}
+.page-head .right{margin-left:auto;display:flex;gap:8px}
+.fchip{padding:6px 13px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:12.5px;font-weight:600;color:var(--muted)}
+.fchip.on{background:#0b1c30;border-color:#0b1c30;color:#fff}
+
+/* grid & cards */
+.row{display:grid;gap:14px;margin-bottom:14px}
+.kpis{grid-template-columns:repeat(4,1fr)}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+.kpi small{display:block;color:var(--muted);font-weight:600;font-size:12px}
+.kpi b{display:block;font-size:26px;letter-spacing:-.04em;margin-top:4px}
+.kpi i{font-style:normal;font-size:12px;font-weight:700}
+.up{color:var(--green)}.dn{color:var(--red)}.wt{color:var(--orange)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+.card h2{margin:0 0 4px;font-size:15px;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
+.card h2 .ai{font-size:10px;font-weight:800;background:#eef;color:var(--purple);border-radius:5px;padding:2px 6px}
+.card .sub{color:var(--muted2);font-size:12px;margin-bottom:14px}
+.c2{grid-template-columns:1.35fr 1fr}
+.c2b{grid-template-columns:1fr 1fr}
+.c3{grid-template-columns:1fr 1fr 1fr}
+
+/* loop strip */
+.loopstrip{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.step{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fafafc}
+.step small{display:block;font-size:10px;font-weight:800;color:var(--muted2);letter-spacing:.08em}
+.step b{font-size:13.5px}
+.step.done{background:#eef7f0;border-color:#cfe8d6}.step.done b{color:var(--green)}
+.step.now{background:#0b1c30;border-color:#0b1c30}.step.now b,.step.now small{color:#fff}
+.step .st{font-size:11px;color:var(--muted2);margin-top:2px}
+.step.done .st{color:var(--green)}.step.now .st{color:#9fc0ec}
+
+/* action list */
+.action{display:flex;gap:12px;align-items:flex-start;padding:12px 4px;border-bottom:1px solid #f0f0f3}
+.action:last-child{border-bottom:0}
+.action .bar{width:4px;align-self:stretch;border-radius:2px}
+.action b{display:block;font-size:13.5px}
+.action p{margin:2px 0 0;color:var(--muted);font-size:12.5px}
+.action .go{margin-left:auto;white-space:nowrap;font-size:12px;font-weight:700;color:var(--blue)}
+.b-red{background:var(--red)}.b-blue{background:var(--blue)}.b-orange{background:var(--orange)}.b-purple{background:var(--purple)}
+
+/* tables */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-size:11.5px;color:var(--muted2);font-weight:700;text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:10px;border-bottom:1px solid #f0f0f3;vertical-align:middle}
+tr:last-child td{border-bottom:0}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.tg-up{background:#e7f4ea;color:var(--green)}
+.tg-dn{background:#fdecef;color:var(--red)}
+.tg-new{background:#eef0ff;color:var(--purple)}
+.tg-wt{background:#fdf3e2;color:var(--orange)}
+.tg-gr{background:#f0f0f3;color:var(--muted)}
+
+/* heatmap */
+.hm{display:grid;grid-template-columns:86px repeat(4,1fr);gap:5px;font-size:12px}
+.hm .hd{display:flex;align-items:center;justify-content:center;color:var(--muted2);font-weight:700;font-size:11.5px}
+.hm .rh{display:flex;align-items:center;color:var(--muted);font-weight:700}
+.hm .cell{border-radius:9px;padding:11px 6px;text-align:center;font-weight:750}
+.legend{display:flex;gap:12px;margin-top:12px;font-size:11px;color:var(--muted2);align-items:center;flex-wrap:wrap}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+
+/* bars */
+.hbar{display:grid;grid-template-columns:110px 1fr 44px;align-items:center;gap:10px;margin-bottom:9px;font-size:12.5px}
+.hbar .lb{color:var(--muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hbar .tr{background:#f0f1f4;border-radius:6px;height:12px;overflow:hidden}
+.hbar .fl{height:100%;border-radius:6px}
+.hbar .vl{text-align:right;font-weight:700;font-size:12px}
+
+/* color chips */
+.cchips{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.cc{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;padding:9px 12px}
+.cc .sw{width:26px;height:26px;border-radius:8px;border:1px solid rgba(0,0,0,.08);flex:none}
+.cc b{font-size:12.5px;display:block}
+.cc small{color:var(--muted2);font-size:11px}
+.cc .tag{margin-left:auto}
+
+/* size split */
+.split{display:flex;height:14px;border-radius:7px;overflow:hidden;min-width:130px}
+.split i{height:100%}
+.s1{background:#0b5bad}.s2{background:#3f8fe0}.s3{background:#8fbceb}.s4{background:#c9def5}
+
+/* kanban */
+.kan{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.kan .col{background:#fafafc;border:1px solid var(--line);border-radius:12px;padding:12px}
+.kan small{display:block;font-size:11px;font-weight:700;color:var(--muted2)}
+.kan b{font-size:24px;letter-spacing:-.04em}
+.kan .mini{margin-top:8px;height:6px;border-radius:3px;background:#e8e9ee;overflow:hidden}
+.kan .mini i{display:block;height:100%;background:var(--blue)}
+
+/* gtm */
+.gtm .ph{display:grid;grid-template-columns:96px 1fr;align-items:center;gap:10px;margin-bottom:8px;font-size:12.5px}
+.gtm .ph .lb{color:var(--muted);font-weight:600}
+.gtm .lane{position:relative;height:18px;background:#f0f1f4;border-radius:9px}
+.gtm .seg{position:absolute;top:0;bottom:0;border-radius:9px;opacity:.9}
+.gtm .months{display:grid;grid-template-columns:96px 1fr;margin-bottom:6px}
+.gtm .mrow{display:grid;grid-template-columns:repeat(7,1fr);font-size:10.5px;color:var(--muted2);font-weight:700}
+.gtm .nowline{position:relative}
+svg{display:block}
+.note{margin-top:10px;font-size:11.5px;color:var(--muted2)}
+@media(max-width:1080px){.kpis{grid-template-columns:repeat(2,1fr)}.c2,.c2b,.c3{grid-template-columns:1fr}.loopstrip,.kan{grid-template-columns:repeat(3,1fr)}.side{display:none}.main{margin-left:0}}
+
+/* family chips */
+.fams{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.fams span{font-size:11px;font-weight:700;padding:4px 9px;border-radius:999px;background:#f0f1f4;color:var(--muted2)}
+.fams span b{font-weight:800;margin-left:3px;color:inherit}
+.fams span.on{background:#eef4ff;color:var(--blue)}
+.fams span.more{background:transparent;color:var(--muted2)}
+/* ===== hover guide ===== */
+[data-g]{position:relative}
+body.guide [data-g]:hover{outline:2px solid rgba(0,113,227,.45);outline-offset:2px;border-radius:16px;cursor:help}
+body.guide .page-head[data-g]:hover{outline:none;border-radius:8px}
+body.guide .page-head[data-g]:hover h1{text-decoration:underline dotted rgba(0,113,227,.6);text-underline-offset:6px}
+.gpop{position:fixed;z-index:999;width:360px;max-width:calc(100vw - 24px);background:#0b1c30;color:#fff;border-radius:14px;padding:14px 16px 12px;box-shadow:0 18px 44px rgba(11,28,48,.35);pointer-events:none;opacity:0;transform:translateY(4px);transition:opacity .12s,transform .12s;font-size:12.5px;line-height:1.55}
+.gpop.on{opacity:1;transform:none}
+.gpop .gt{font-size:13.5px;font-weight:800;letter-spacing:-.02em;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.gpop .gt em{font-style:normal;font-size:10px;font-weight:800;letter-spacing:.08em;color:#8fb4e8;background:rgba(143,180,232,.15);border-radius:5px;padding:2px 6px}
+.gpop .gr{display:grid;grid-template-columns:58px 1fr;gap:10px;padding:7px 0;border-top:1px solid rgba(255,255,255,.09)}
+.gpop .gr small{font-size:10.5px;font-weight:800;letter-spacing:.04em;padding-top:2px}
+.gpop .gr.what small{color:#8fb4e8}.gpop .gr.ins small{color:#ffd166}.gpop .gr.dec small{color:#7ee2a0}
+.gpop .gr p{margin:0;color:#e6ecf5}
+.gpop .gr.dec p{color:#fff;font-weight:600}
+.gtog{cursor:pointer;user-select:none;border:1px solid var(--line);background:#fff;color:var(--muted)}
+.gtog.on{background:#0b1c30;border-color:#0b1c30;color:#fff}
+.gtog i{font-style:normal;font-weight:800;margin-right:4px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb-brand"><b>MLB</b><span>Total Merchandising</span></div>
+  <span class="chip">27FW</span>
+  <span class="chip demo">예시 화면 · 샘플 데이터</span>
+  <span class="chip gtog on" id="gtog" title="섹션에 마우스를 올리면 설명 팝업이 뜹니다"><i>?</i>가이드 ON</span>
+  <div class="tb-right"><span><span class="dot-live"></span>2026-09-07 13:46 자동 갱신</span><span>9월 운영</span></div>
+</div>
+
+<nav class="side">
+  <a href="#home" data-tab="home"><span class="no">◉</span>홈 · 종합</a>
+  <div class="sep">WORKSPACE</div>
+  <a href="#market" data-tab="market"><span class="no">01</span>마켓 · 트렌드</a>
+  <a href="#category" data-tab="category"><span class="no">02</span>카테고리</a>
+  <a href="#color" data-tab="color"><span class="no">03</span>컬러</a>
+  <a href="#material" data-tab="material"><span class="no">04</span>소재 · 디자인</a>
+  <a href="#design" data-tab="design"><span class="no">05</span>디자인 진행</a>
+  <a href="#order" data-tab="order"><span class="no">06</span>오더 · 출시 일정</a>
+  <div class="help">? 쉬운 설명<br><span style="color:var(--muted2)">모든 숫자는 클릭하면 근거 데이터가 열립니다 (예시)</span></div>
+</nav>
+
+<main class="main">
+
+<!-- ============ HOME ============ -->
+<section class="tab" id="tab-home">
+  <div class="page-head" data-g="pg-home">
+    <h1>오늘의 머천다이징</h1>
+    <p>9월 운영 현황 — 26FW 판매 반응을 27FW 기획에 반영 중</p>
+  </div>
+
+  <div class="row kpis" data-g="home-kpi">
+    <div class="kpi"><small>이번 달 새롭게 포착된 시장 변화</small><b>12건</b><i class="up">▲ 4 전월 대비</i></div>
+    <div class="kpi"><small>시장 반응은 있으나 27FW 계획에 없는 항목</small><b>5건</b><i class="dn">검토 필요</i></div>
+    <div class="kpi"><small>27FW 디자인 진행률</small><b>62%</b><i class="up">2차 디자인 검토 21건</i></div>
+    <div class="kpi"><small>상품별 수량 초안 대기</small><b>3건</b><i class="wt">영업 검토 중</i></div>
+  </div>
+
+  <div class="row">
+    <div class="card" data-g="home-loop">
+      <h2>월간 순환 현황</h2>
+      <div class="sub">6단계가 매월 반복됩니다 — 지금은 시장·판매 결과를 기획 후보와 연결하는 단계</div>
+      <div class="loopstrip">
+        <div class="step done"><small>M+0</small><b>수집</b><div class="st">완료 · 9/1</div></div>
+        <div class="step now"><small>M+0</small><b>연결</b><div class="st">진행 중</div></div>
+        <div class="step"><small>M+1</small><b>개발</b><div class="st">대기</div></div>
+        <div class="step"><small>M+1</small><b>검증</b><div class="st">대기</div></div>
+        <div class="step"><small>M+2</small><b>오더</b><div class="st">대기</div></div>
+        <div class="step"><small>M+3~</small><b>판매 반영</b><div class="st">상시</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row c2">
+    <div class="card" data-g="home-judge">
+      <h2>오늘의 판단 <span class="ai">AI</span></h2>
+      <div class="sub">데이터가 좁혀 놓은, 사람이 결정할 3가지</div>
+      <div class="action"><div class="bar b-red"></div><div><b>숏패딩 · 중국 관심 3개월 연속 상승, 27FW 계획에는 없음</b><p>26FW Street × Over 판매율도 74%로 높아 신규 반영 검토가 필요</p></div><div class="go">02 카테고리 →</div></div>
+      <div class="action"><div class="bar b-orange"></div><div><b>INDIGO · 26FW 판매 비중 21%인데 판매율은 42%</b><p>비중 대비 반응이 낮아 27FW는 축소하고, 비슷한 톤의 NAVY 확대를 검토</p></div><div class="go">03 컬러 →</div></div>
+      <div class="action"><div class="bar b-purple"></div><div><b>발라클라바 2차 검토 지연 3건 · 협력사 응답 대기</b><p>평균 개발 기간보다 6일 늦어 담당자와 완료 일정을 다시 정해야 함</p></div><div class="go">05 디자인 →</div></div>
+    </div>
+    <div class="card" data-g="home-signal">
+      <h2>시장 관심 변화</h2>
+      <div class="sub">중국·동남아·인스타그램에서 함께 확인된 흐름 · 최근 12주</div>
+      <svg viewBox="0 0 460 150" width="100%">
+        <g stroke="#eef0f3"><line x1="0" y1="30" x2="460" y2="30"/><line x1="0" y1="70" x2="460" y2="70"/><line x1="0" y1="110" x2="460" y2="110"/></g>
+        <polyline fill="none" stroke="#c9def5" stroke-width="2.5" points="10,108 50,96 90,102 130,84 170,90 210,76 250,82 290,66 330,72 370,55 410,60 450,42"/>
+        <polyline fill="none" stroke="#0071e3" stroke-width="3" points="10,118 50,112 90,98 130,104 170,86 210,92 250,72 290,80 330,58 370,66 410,44 450,30"/>
+        <circle cx="450" cy="30" r="4.5" fill="#0071e3"/>
+        <text x="452" y="18" font-size="11" font-weight="700" fill="#0071e3" text-anchor="end">28</text>
+      </svg>
+      <div class="legend"><span><i style="background:#0071e3"></i>지속 신호</span><span><i style="background:#c9def5"></i>신규 진입</span></div>
+    </div>
+  </div>
+
+  <div class="row c3">
+    <div class="card" data-g="home-color">
+      <h2>컬러 판정 요약</h2>
+      <div class="sub">104개 컬러 · 27FW 방향</div>
+      <div class="hbar"><span class="lb">확대</span><div class="tr"><div class="fl" style="width:14%;background:#1a7f37"></div></div><span class="vl">15</span></div>
+      <div class="hbar"><span class="lb">유지</span><div class="tr"><div class="fl" style="width:46%;background:#8fbceb"></div></div><span class="vl">48</span></div>
+      <div class="hbar"><span class="lb">신규 관찰</span><div class="tr"><div class="fl" style="width:38%;background:#7255e8"></div></div><span class="vl">40</span></div>
+      <div class="hbar"><span class="lb">축소 · 주의</span><div class="tr"><div class="fl" style="width:9%;background:#e2264c"></div></div><span class="vl">1</span></div>
+    </div>
+    <div class="card" data-g="home-minimap">
+      <h2>카테고리 판매 미니맵</h2>
+      <div class="sub">라이프스타일 × 핏 · 26FW 현재 판매율</div>
+      <div class="hm" style="grid-template-columns:64px repeat(4,1fr)">
+        <div></div><div class="hd">Over</div><div class="hd">Mega</div><div class="hd">Mid</div><div class="hd">Slim</div>
+        <div class="rh">Street</div><div class="cell" style="background:#0a63c9;color:#fff">61</div><div class="cell" style="background:#0a63c9;color:#fff">74</div><div class="cell" style="background:#0a63c9;color:#fff">79</div><div class="cell" style="background:#c9def5">48</div>
+        <div class="rh">Basic</div><div class="cell" style="background:#3f8fe0;color:#fff">68</div><div class="cell" style="background:#0a63c9;color:#fff">74</div><div class="cell" style="background:#8fbceb">52</div><div class="cell" style="background:#c9def5">45</div>
+        <div class="rh">Premium</div><div class="cell" style="background:#3f8fe0;color:#fff">66</div><div class="cell" style="background:#8fbceb">58</div><div class="cell" style="background:#8fbceb">50</div><div class="cell" style="background:#c9def5">41</div>
+        <div class="rh">Sportive</div><div class="cell" style="background:#c9def5">44</div><div class="cell" style="background:#c9def5">49</div><div class="cell" style="background:#8fbceb">57</div><div class="cell" style="background:#e8f0fa">38</div>
+      </div>
+    </div>
+    <div class="card" data-g="home-perf">
+      <h2>26FW 판매 현황</h2>
+      <div class="sub">국가별 현재 판매율 · 9/7 갱신</div>
+      <div class="hbar"><span class="lb">KOR 판매율</span><div class="tr"><div class="fl" style="width:66%;background:#0b5bad"></div></div><span class="vl">66%</span></div>
+      <div class="hbar"><span class="lb">CHN 판매율</span><div class="tr"><div class="fl" style="width:58%;background:#3f8fe0"></div></div><span class="vl">58%</span></div>
+      <div class="hbar"><span class="lb">SEA 판매율</span><div class="tr"><div class="fl" style="width:61%;background:#8fbceb"></div></div><span class="vl">61%</span></div>
+      <div class="note">원본: 주간 · 월간 판매 대시보드 (자동 연동)</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 01 MARKET ============ -->
+<section class="tab" id="tab-market">
+  <div class="page-head" data-g="pg-market">
+    <h1>01 · 마켓 · 트렌드</h1><p>중국 · 동남아 월간 신호와 글로벌 트렌드</p>
+    <div class="right"><span class="fchip on">전체</span><span class="fchip">중국</span><span class="fchip">동남아</span><span class="fchip">8월 vs 9월</span></div>
+  </div>
+
+  <div class="row kpis" data-g="mk-kpi">
+    <div class="kpi"><small>중국 신규 아이템</small><b>27건</b><i class="up">▲ 8</i></div>
+    <div class="kpi"><small>관심 상승 항목</small><b>9건</b><i class="up">3개월 연속 4건</i></div>
+    <div class="kpi"><small>관심 하락 항목</small><b>4건</b><i class="dn">27FW 반영 전 재검토</i></div>
+    <div class="kpi"><small>기획 반영 완료</small><b>14 / 27</b><i class="wt">5건 공백</i></div>
+  </div>
+
+  <div class="row c2">
+    <div class="card" data-g="mk-signal">
+      <h2>카테고리 관심도 — 8월 vs 9월</h2>
+      <div class="sub">막대가 커진 곳이 이번 달 강화된 신호입니다</div>
+      <svg viewBox="0 0 560 220" width="100%">
+        <g font-size="11" fill="#9a9aa0" text-anchor="middle">
+          <text x="55" y="214">숏패딩</text><text x="145" y="214">발라클라바</text><text x="235" y="214">카고팬츠</text><text x="325" y="214">니트베스트</text><text x="415" y="214">머플러</text><text x="505" y="214">부츠</text>
+        </g>
+        <g>
+          <rect x="30" y="105" width="22" height="90" rx="4" fill="#c9def5"/><rect x="56" y="55" width="22" height="140" rx="4" fill="#0071e3"/>
+          <rect x="120" y="120" width="22" height="75" rx="4" fill="#c9def5"/><rect x="146" y="75" width="22" height="120" rx="4" fill="#0071e3"/>
+          <rect x="210" y="110" width="22" height="85" rx="4" fill="#c9def5"/><rect x="236" y="88" width="22" height="107" rx="4" fill="#0071e3"/>
+          <rect x="300" y="140" width="22" height="55" rx="4" fill="#c9def5"/><rect x="326" y="118" width="22" height="77" rx="4" fill="#0071e3"/>
+          <rect x="390" y="128" width="22" height="67" rx="4" fill="#c9def5"/><rect x="416" y="132" width="22" height="63" rx="4" fill="#0071e3"/>
+          <rect x="480" y="115" width="22" height="80" rx="4" fill="#c9def5"/><rect x="506" y="150" width="22" height="45" rx="4" fill="#0071e3"/>
+        </g>
+        <text x="67" y="46" font-size="11" font-weight="800" fill="#0071e3" text-anchor="middle">+38%</text>
+        <text x="157" y="66" font-size="11" font-weight="800" fill="#0071e3" text-anchor="middle">+31%</text>
+      </svg>
+      <div class="legend"><span><i style="background:#c9def5"></i>8월</span><span><i style="background:#0071e3"></i>9월</span></div>
+    </div>
+    <div class="card" data-g="mk-gap">
+      <h2>27FW에 빠진 기회 <span class="ai">AI</span></h2>
+      <div class="sub">시장 관심은 높아졌지만 27FW 계획에는 아직 없는 아이템</div>
+      <table>
+        <tr><th>아이템</th><th>확인 근거</th><th>27FW 상태</th></tr>
+        <tr><td><b>숏패딩 (크롭 기장)</b></td><td>중국 3개월↑ · IG 교차 8</td><td><span class="tag tg-dn">구성 없음</span></td></tr>
+        <tr><td><b>발라클라바 니트</b></td><td>신규 진입 · 경쟁 4사 출시</td><td><span class="tag tg-dn">구성 없음</span></td></tr>
+        <tr><td><b>니트 베스트 레이어드</b></td><td>인스타그램 지속 12주</td><td><span class="tag tg-wt">1차 디자인 검토 중</span></td></tr>
+        <tr><td><b>퍼 트리밍 후드</b></td><td>중국 신규 · 단가 상위</td><td><span class="tag tg-dn">구성 없음</span></td></tr>
+        <tr><td><b>와이드 카고 (기모)</b></td><td>바지 확장 축</td><td><span class="tag tg-wt">검토 중</span></td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 02 CATEGORY ============ -->
+<section class="tab" id="tab-category">
+  <div class="page-head" data-g="pg-category">
+    <h1>02 · 카테고리</h1><p>26FW 현재 판매 × 시장 변화 → 27FW 상품 구성</p>
+    <div class="right"><span class="fchip on">통합</span><span class="fchip">한국</span><span class="fchip">중국</span></div>
+  </div>
+
+  <div class="row c2">
+    <div class="card" data-g="cat-matrix">
+      <h2>라이프스타일 × 핏 매트릭스</h2>
+      <div class="sub">각 칸 = 26FW 현재 판매율(준비한 수량 중 판매된 비율) · 진할수록 좋음</div>
+      <div class="hm">
+        <div></div><div class="hd">Over</div><div class="hd">Mega Over</div><div class="hd">Mid</div><div class="hd">Slim</div>
+        <div class="rh">Street</div><div class="cell" style="background:#3f8fe0;color:#fff">61</div><div class="cell" style="background:#0a63c9;color:#fff">74</div><div class="cell" style="background:#0a63c9;color:#fff">79</div><div class="cell" style="background:#c9def5">48</div>
+        <div class="rh">Basic</div><div class="cell" style="background:#3f8fe0;color:#fff">68</div><div class="cell" style="background:#0a63c9;color:#fff">74</div><div class="cell" style="background:#8fbceb">52</div><div class="cell" style="background:#c9def5">45</div>
+        <div class="rh">Premium</div><div class="cell" style="background:#3f8fe0;color:#fff">66</div><div class="cell" style="background:#8fbceb">58</div><div class="cell" style="background:#8fbceb">50</div><div class="cell" style="background:#c9def5">41</div>
+        <div class="rh">Sportive</div><div class="cell" style="background:#c9def5">44</div><div class="cell" style="background:#c9def5">49</div><div class="cell" style="background:#8fbceb">57</div><div class="cell" style="background:#e8f0fa">38</div>
+      </div>
+      <div class="legend"><span><i style="background:#0a63c9"></i>70%+</span><span><i style="background:#3f8fe0"></i>60~70</span><span><i style="background:#8fbceb"></i>50~60</span><span><i style="background:#c9def5"></i>40~50</span><span><i style="background:#e8f0fa"></i>~40</span></div>
+    </div>
+    <div class="card" data-g="cat-action">
+      <h2>27FW 핵심 조합 제안 <span class="ai">AI</span></h2>
+      <div class="sub">26FW 판매율 × 최근 4주 판매 속도 × 시장 변화를 함께 비교</div>
+      <table>
+        <tr><th>조합</th><th>판단 근거</th><th>27FW 제안</th></tr>
+        <tr><td><b>Street × Over</b></td><td>판매율 61% · 최근 4주 +8%</td><td><span class="tag tg-up">구성 확대</span></td></tr>
+        <tr><td><b>Basic × Mega Over</b></td><td>판매율 74% · 꾸준한 판매</td><td><span class="tag tg-up">구성 보강</span></td></tr>
+        <tr><td><b>Street × Mid</b></td><td>판매율 79% · 판매 비중 0.1%</td><td><span class="tag tg-up">숨은 기회</span></td></tr>
+        <tr><td><b>숏패딩 신규 라인</b></td><td>시장 관심 3개월 연속 상승</td><td><span class="tag tg-new">신규 검토</span></td></tr>
+        <tr><td><b>Sportive × Slim</b></td><td>판매율 38% · 최근 4주 하락</td><td><span class="tag tg-dn">구성 축소</span></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="card" data-g="cat-item">
+      <h2>아이템별 — 현재 판매율과 최근 판매 속도</h2>
+      <div class="sub">막대 = 26FW 현재 판매율 · 점 = 최근 4주 판매 속도(시즌 평균=100)</div>
+      <svg viewBox="0 0 1120 190" width="100%">
+        <g font-size="11" fill="#9a9aa0" text-anchor="middle">
+          <text x="80" y="184">다운</text><text x="215" y="184">MTM</text><text x="350" y="184">후드</text><text x="485" y="184">니트</text><text x="620" y="184">팬츠</text><text x="755" y="184">데님</text><text x="890" y="184">스커트</text><text x="1025" y="184">베스트</text>
+        </g>
+        <g fill="#0b5bad">
+          <rect x="50" y="42" width="60" height="126" rx="6" opacity=".9"/><rect x="185" y="58" width="60" height="110" rx="6" opacity=".9"/>
+          <rect x="320" y="52" width="60" height="116" rx="6" opacity=".9"/><rect x="455" y="84" width="60" height="84" rx="6" opacity=".9"/>
+          <rect x="590" y="70" width="60" height="98" rx="6" opacity=".9"/><rect x="725" y="106" width="60" height="62" rx="6" opacity=".9"/>
+          <rect x="860" y="96" width="60" height="72" rx="6" opacity=".9"/><rect x="995" y="118" width="60" height="50" rx="6" opacity=".9"/>
+        </g>
+        <g fill="#e2264c">
+          <circle cx="80" cy="56" r="6"/><circle cx="215" cy="88" r="6"/><circle cx="350" cy="44" r="6"/><circle cx="485" cy="72" r="6"/>
+          <circle cx="620" cy="112" r="6"/><circle cx="755" cy="72" r="6"/><circle cx="890" cy="128" r="6"/><circle cx="1025" cy="140" r="6"/>
+        </g>
+      </svg>
+      <div class="legend"><span><i style="background:#0b5bad"></i>26FW 판매율</span><span><i style="background:#e2264c;border-radius:50%"></i>최근 4주 판매 속도</span><span>· 점이 높을수록 최근에 더 빠르게 팔리는 아이템</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 COLOR ============ -->
+<section class="tab" id="tab-color">
+  <div class="page-head" data-g="pg-color">
+    <h1>03 · 컬러</h1><p>26FW 판매율 × 실제 판매 비중 → 27FW 확대 · 유지 · 축소 · 신규</p>
+    <div class="right"><span class="fchip on">전체</span><span class="fchip">아우터</span><span class="fchip">이너</span><span class="fchip">바텀</span></div>
+  </div>
+
+  <div class="row c2">
+    <div class="card" data-g="col-quad">
+      <h2>컬러 판매 위치도</h2>
+      <div class="sub">가로 = 전체 판매에서 차지하는 비중 · 세로 = 26FW 현재 판매율</div>
+      <svg viewBox="0 0 620 400" width="100%">
+        <rect x="20" y="20" width="290" height="180" rx="10" fill="#eef7f0"/>
+        <rect x="310" y="20" width="290" height="180" rx="10" fill="#e8f0fa"/>
+        <rect x="20" y="200" width="290" height="180" rx="10" fill="#fdf6f7"/>
+        <rect x="310" y="200" width="290" height="180" rx="10" fill="#fdecef"/>
+        <g font-size="12" font-weight="800">
+          <text x="34" y="42" fill="#1a7f37">숨은 기회 · 27FW 확대</text>
+          <text x="324" y="42" fill="#0b5bad">핵심 컬러 · 유지</text>
+          <text x="34" y="222" fill="#b98a92">낮은 반응 · 제외 검토</text>
+          <text x="324" y="222" fill="#e2264c">비중 크지만 부진 · 축소</text>
+        </g>
+        <g>
+          <circle cx="420" cy="78" r="15" fill="#17171a"/><text x="420" y="110" font-size="11" font-weight="700" fill="#555" text-anchor="middle">BLACK</text>
+          <circle cx="470" cy="62" r="12" fill="#b9b9bd" stroke="#999" stroke-width="1"/><text x="470" y="42" font-size="10.5" font-weight="700" fill="#777" text-anchor="middle">MG.GREY</text>
+          <circle cx="530" cy="120" r="10" fill="#b08954"/><text x="530" y="146" font-size="10.5" font-weight="700" fill="#777" text-anchor="middle">CAMEL</text>
+          <circle cx="95" cy="52" r="9" fill="#d96d1f"/><text x="95" y="34" font-size="10.5" font-weight="700" fill="#1a7f37" text-anchor="middle">D.ORANGE ↑</text>
+          <circle cx="150" cy="88" r="9" fill="#efe6d5" stroke="#c9bfa8" stroke-width="1"/><text x="150" y="114" font-size="10.5" font-weight="700" fill="#777" text-anchor="middle">PTN.CREAM</text>
+          <circle cx="205" cy="120" r="9" fill="#2e5339"/><text x="205" y="146" font-size="10.5" font-weight="700" fill="#777" text-anchor="middle">FOREST</text>
+          <circle cx="430" cy="330" r="12" fill="#2b3a67"/><text x="430" y="358" font-size="10.5" font-weight="800" fill="#e2264c" text-anchor="middle">INDIGO ↓</text>
+          <circle cx="500" cy="262" r="11" fill="#1f2c4d"/><text x="500" y="288" font-size="10.5" font-weight="700" fill="#777" text-anchor="middle">NAVY</text>
+          <circle cx="370" cy="300" r="9" fill="#5a4634"/><text x="370" y="324" font-size="10.5" font-weight="700" fill="#777" text-anchor="middle">D.BROWN</text>
+          <circle cx="90" cy="322" r="8" fill="#e8b7c4"/><text x="90" y="346" font-size="10.5" font-weight="700" fill="#999" text-anchor="middle">L.PINK</text>
+          <circle cx="170" cy="282" r="8" fill="#8e8e93"/><text x="170" y="306" font-size="10.5" font-weight="700" fill="#999" text-anchor="middle">GREY MEL</text>
+        </g>
+      </svg>
+    </div>
+    <div class="card" data-g="col-action">
+      <h2>27FW 컬러 제안 <span class="ai">AI</span></h2>
+      <div class="sub">26FW 판매 결과를 근거로 27FW 컬러와 사이즈 수량 방향을 제안</div>
+      <div class="cchips">
+        <div class="cc"><span class="sw" style="background:#17171a"></span><div><b>BLACK</b><small>판매율 71% · 비중 26%</small></div><span class="tag tg-up">유지</span></div>
+        <div class="cc"><span class="sw" style="background:#b9b9bd"></span><div><b>MG.GREY</b><small>판매율 74% · 비중 19%</small></div><span class="tag tg-up">확대</span></div>
+        <div class="cc"><span class="sw" style="background:#d96d1f"></span><div><b>D.ORANGE</b><small>판매율 78% · 비중 4%</small></div><span class="tag tg-up">구성 확대</span></div>
+        <div class="cc"><span class="sw" style="background:#efe6d5"></span><div><b>PTN.CREAM</b><small>신규 · 초도 관찰</small></div><span class="tag tg-new">신규</span></div>
+        <div class="cc"><span class="sw" style="background:#2b3a67"></span><div><b>INDIGO</b><small>판매율 42% · 비중 21%</small></div><span class="tag tg-dn">축소</span></div>
+        <div class="cc"><span class="sw" style="background:#e8b7c4"></span><div><b>L.PINK</b><small>판매율 35% · 비중 5%</small></div><span class="tag tg-dn">제외 검토</span></div>
+      </div>
+      <div class="note">모든 컬러를 같은 기준으로 비교하고, 확정된 방향은 컬러 × 사이즈별 수량 초안에 반영합니다</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 04 MATERIAL ============ -->
+<section class="tab" id="tab-material">
+  <div class="page-head" data-g="pg-material">
+    <h1>04 · 소재 · 디자인</h1><p>소재 · 컬러 · 디자인 종류 · 그래픽을 함께 보고, 어떤 조합을 개발할지 결정</p>
+    <div class="right"><span class="fchip on">공통 디자인 분류 · 399종</span><span class="fchip">21개 상품군</span><span class="fchip">AI 이미지 판독</span></div>
+  </div>
+
+  <div class="row kpis" data-g="mat-kpi">
+    <div class="kpi"><small>① 26FW 판매율 1위 소재</small><b>나일론 립스탑</b><i class="up">판매율 72%</i></div>
+    <div class="kpi"><small>② 26FW 판매율 1위 컬러</small><b>MG.GREY</b><i class="up">판매율 74%</i></div>
+    <div class="kpi"><small>③ 26FW 판매율 1위 디자인</small><b>Puffer Jacket</b><i class="up">판매율 76% · 재킷 상품군</i></div>
+    <div class="kpi"><small>④ 26FW 판매율 1위 그래픽</small><b>스몰 로고</b><i class="up">판매율 74%</i></div>
+  </div>
+
+  <div class="row">
+    <div class="card" data-g="mat-design">
+      <h2>디자인별 시장 반응과 판매 결과 <span class="ai">AI</span></h2>
+      <div class="sub">공통 디자인 분류 399종 중 27FW 관련 디자인 — AI가 읽은 시장 이미지와 26FW 실제 판매를 함께 비교</div>
+      <div class="fams">
+        <span class="on">jacket <b>36</b></span><span class="on">coat <b>29</b></span><span class="on">pants <b>26</b></span><span class="on">headwear <b>23</b></span><span class="on">sweater <b>8</b></span><span class="on">vest <b>7</b></span><span class="on">cardigan <b>6</b></span><span class="on">top_shirt <b>33</b></span><span>shoe <b>42</b></span><span>bag <b>29</b></span><span>dress <b>32</b></span><span>skirt <b>26</b></span><span>shorts <b>20</b></span><span>scarf_belt <b>9</b></span><span class="more">+7 상품군</span>
+      </div>
+      <table>
+        <tr><th>디자인 종류</th><th>상품군 · 사내 품목</th><th>26FW 판매율</th><th>시장에서 보이는 정도</th><th>형태 · 핏 특징</th><th>27FW 제안</th></tr>
+        <tr><td><b>Puffer Jacket</b></td><td>jacket · DJ / PD</td><td><b style="color:#0b5bad">76%</b></td><td>지속 12주 · 관련 크리에이터 비중 31%</td><td>oversized · Cropped Boxy</td><td><span class="tag tg-up">확대</span></td></tr>
+        <tr><td><b>Half-zip Sweater</b></td><td>sweater · KP</td><td><b style="color:#0b5bad">70%</b></td><td>상승 8주 · 관련 크리에이터 비중 18%</td><td>regular fit · Relaxed</td><td><span class="tag tg-up">확대</span></td></tr>
+        <tr><td><b>Puffer Vest</b></td><td>vest · DV</td><td><b style="color:#0b5bad">71%</b></td><td>신규 진입 6주 · 레이어드 착장</td><td>Boxy · Relaxed</td><td><span class="tag tg-up">보강</span></td></tr>
+        <tr><td><b>Cargo Pants</b></td><td>pants · PT</td><td><b style="color:#3f8fe0">63%</b></td><td>상승 · 기모 와이드 축 연계</td><td>wide leg · Relaxed</td><td><span class="tag tg-up">보강</span></td></tr>
+        <tr><td><b>Balaclava</b></td><td>headwear · BEANIE</td><td><span style="color:#9a9aa0">구성 없음</span></td><td>신규 진입 · 경쟁 4사 출시</td><td>—</td><td><span class="tag tg-new">신규 검토</span></td></tr>
+        <tr><td><b>Hood Zip-up</b></td><td>jacket · TR</td><td><b style="color:#8fbceb">58%</b></td><td>유지 · 관련 크리에이터 비중 12%</td><td>regular fit · Relaxed</td><td><span class="tag tg-gr">유지</span></td></tr>
+        <tr><td><b>Varsity Jacket</b></td><td>jacket · JP</td><td><b style="color:#c9def5">52%</b></td><td>하락 · 3개월 연속</td><td>Boxy · Relaxed</td><td><span class="tag tg-dn">축소</span></td></tr>
+        <tr><td><b>Teddy Bear Coat</b></td><td>coat · FD</td><td><b style="color:#c9def5">44%</b></td><td>하락 · 관련 크리에이터 비중 4%</td><td>Cocoon · Relaxed</td><td><span class="tag tg-dn">축소</span></td></tr>
+      </table>
+      <div class="note">디자인 종류는 Puffer Jacket처럼 상품의 형태를 가장 구체적으로 부르는 공통 이름입니다. 한 상품에 하나를 붙이고, oversized·Boxy 같은 형태와 Relaxed·Slim 같은 핏은 별도 특징으로 기록해 02 카테고리 판매율과 함께 봅니다.</div>
+    </div>
+  </div>
+
+  <div class="row c2b">
+    <div class="card" data-g="mat-dist">
+      <h2>소재·그래픽별 판매율</h2>
+      <div class="sub">같은 기준으로 분류한 소재와 그래픽별 26FW 현재 판매율</div>
+      <div class="hbar"><span class="lb">다운 · 구스</span><div class="tr"><div class="fl" style="width:72%;background:#0b5bad"></div></div><span class="vl">72%</span></div>
+      <div class="hbar"><span class="lb">다운 · 덕</span><div class="tr"><div class="fl" style="width:64%;background:#3f8fe0"></div></div><span class="vl">64%</span></div>
+      <div class="hbar"><span class="lb">충전재 헤비</span><div class="tr"><div class="fl" style="width:69%;background:#3f8fe0"></div></div><span class="vl">69%</span></div>
+      <div class="hbar"><span class="lb">기모 가공</span><div class="tr"><div class="fl" style="width:61%;background:#8fbceb"></div></div><span class="vl">61%</span></div>
+      <div class="hbar"><span class="lb">빅 로고</span><div class="tr"><div class="fl" style="width:47%;background:#c9def5"></div></div><span class="vl">47%</span></div>
+      <div class="hbar"><span class="lb">무지 (로고리스)</span><div class="tr"><div class="fl" style="width:55%;background:#8fbceb"></div></div><span class="vl">55%</span></div>
+    </div>
+    <div class="card" data-g="mat-win">
+      <h2>성과가 좋은 조합 <span class="ai">AI</span></h2>
+      <div class="sub">소재 × 컬러 × 디자인 종류 × 그래픽을 함께 봤을 때 26FW 판매율이 높은 조합</div>
+      <table>
+        <tr><th>소재</th><th>컬러</th><th>디자인 종류</th><th>그래픽</th><th>26FW 판매율</th></tr>
+        <tr><td>나일론 립스탑</td><td>BLACK</td><td>Puffer Jacket</td><td>스몰 로고</td><td><b style="color:#0b5bad">81%</b></td></tr>
+        <tr><td>구스다운</td><td>MG.GREY</td><td>Puffer Vest</td><td>스몰 로고</td><td><b style="color:#0b5bad">77%</b></td></tr>
+        <tr><td>울 혼방</td><td>D.ORANGE</td><td>Half-zip Sweater</td><td>자수 로고</td><td><b style="color:#3f8fe0">70%</b></td></tr>
+        <tr><td>기모 코튼</td><td>NAVY</td><td>Hood Zip-up</td><td>빅 로고</td><td><b style="color:#8fbceb">58%</b></td></tr>
+      </table>
+      <div class="note">판매가 부진하면 소재·컬러·디자인 종류·그래픽 중 어느 부분이 원인인지 하나씩 비교합니다</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 05 DESIGN ============ -->
+<section class="tab" id="tab-design">
+  <div class="page-head" data-g="pg-design">
+    <h1>05 · 디자인 진행</h1><p>1차 · 2차 디자인 검토와 샘플 진행 상태 — 협력사 시스템에서 자동 수집</p>
+  </div>
+
+  <div class="row">
+    <div class="card" data-g="dsg-pipe">
+      <h2>27FW 디자인 개발 단계</h2>
+      <div class="sub">기획 확정 48건 기준 · 매일 자동 갱신</div>
+      <div class="kan">
+        <div class="col"><small>기획 확정</small><b>48</b><div class="mini"><i style="width:100%"></i></div></div>
+        <div class="col"><small>1차 디자인 검토</small><b>32</b><div class="mini"><i style="width:67%"></i></div></div>
+        <div class="col"><small>2차 디자인 검토</small><b>21</b><div class="mini"><i style="width:44%"></i></div></div>
+        <div class="col"><small>샘플 개발</small><b>12</b><div class="mini"><i style="width:25%"></i></div></div>
+        <div class="col"><small>완료</small><b>6</b><div class="mini"><i style="width:13%"></i></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row c2b">
+    <div class="card" data-g="dsg-prog">
+      <h2>카테고리별 진행률</h2>
+      <div class="sub">2차 디자인 검토를 통과한 비율</div>
+      <div class="hbar"><span class="lb">다운 · 패딩</span><div class="tr"><div class="fl" style="width:80%;background:#0b5bad"></div></div><span class="vl">80%</span></div>
+      <div class="hbar"><span class="lb">MTM · 후드</span><div class="tr"><div class="fl" style="width:55%;background:#3f8fe0"></div></div><span class="vl">55%</span></div>
+      <div class="hbar"><span class="lb">니트</span><div class="tr"><div class="fl" style="width:48%;background:#3f8fe0"></div></div><span class="vl">48%</span></div>
+      <div class="hbar"><span class="lb">팬츠</span><div class="tr"><div class="fl" style="width:40%;background:#8fbceb"></div></div><span class="vl">40%</span></div>
+      <div class="hbar"><span class="lb">ACC</span><div class="tr"><div class="fl" style="width:35%;background:#8fbceb"></div></div><span class="vl">35%</span></div>
+    </div>
+    <div class="card" data-g="dsg-map">
+      <h2>기획안별 디자인 진행 연결 <span class="ai">AI</span></h2>
+      <div class="sub">기획한 아이템이 실제 디자인 단계에서 어디까지 왔는지 수시로 확인</div>
+      <table>
+        <tr><th>아이템</th><th>단계</th><th>상태</th></tr>
+        <tr><td><b>숏패딩 크롭</b> · 신규 라인</td><td>기획 확정 → 1차 대기</td><td><span class="tag tg-new">이번 주 착수</span></td></tr>
+        <tr><td><b>발라클라바 니트</b></td><td>2차 디자인 검토</td><td><span class="tag tg-dn">6일 지연</span></td></tr>
+        <tr><td><b>MTM 오버핏</b></td><td>샘플 개발</td><td><span class="tag tg-up">정상</span></td></tr>
+        <tr><td><b>와이드 카고</b></td><td>1차 디자인 검토</td><td><span class="tag tg-up">정상</span></td></tr>
+        <tr><td><b>퍼 트리밍 후드</b></td><td>미배정</td><td><span class="tag tg-wt">담당 디자인 없음</span></td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 06 ORDER ============ -->
+<section class="tab" id="tab-order">
+  <div class="page-head" data-g="pg-order">
+    <h1>06 · 오더 · 출시 일정</h1><p>AI 수량 초안 → 영업 조정 → 수주 · 상품설명서 · 출시 준비</p>
+  </div>
+
+  <div class="row">
+    <div class="card" data-g="ord-draft">
+      <h2>상품별 수량 초안 <span class="ai">AI</span></h2>
+      <div class="sub">컬러 × 사이즈 배분까지 자동 산출 — 영업이 조정 후 확정</div>
+      <table>
+        <tr><th>아이템</th><th>컬러</th><th>제안 수량</th><th>사이즈 배분 (S·M·L·XL)</th><th>상태</th></tr>
+        <tr><td><b>숏패딩 다운</b></td><td>BLACK</td><td>12,400</td><td><div class="split"><i class="s1" style="width:18%"></i><i class="s2" style="width:34%"></i><i class="s3" style="width:32%"></i><i class="s4" style="width:16%"></i></div></td><td><span class="tag tg-wt">영업 검토중</span></td></tr>
+        <tr><td><b>MTM 오버핏</b></td><td>MG.GREY</td><td>8,900</td><td><div class="split"><i class="s1" style="width:22%"></i><i class="s2" style="width:36%"></i><i class="s3" style="width:28%"></i><i class="s4" style="width:14%"></i></div></td><td><span class="tag tg-wt">영업 검토중</span></td></tr>
+        <tr><td><b>발라클라바 니트</b></td><td>IVORY</td><td>5,200</td><td><div class="split"><i class="s2" style="width:52%"></i><i class="s3" style="width:48%"></i></div></td><td><span class="tag tg-gr">초안</span></td></tr>
+        <tr><td><b>와이드 카고 (기모)</b></td><td>D.BEIGE</td><td>7,600</td><td><div class="split"><i class="s1" style="width:16%"></i><i class="s2" style="width:32%"></i><i class="s3" style="width:34%"></i><i class="s4" style="width:18%"></i></div></td><td><span class="tag tg-up">확정</span></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="row c2b">
+    <div class="card gtm" data-g="ord-gtm">
+      <h2>27FW 출시 준비 일정</h2>
+      <div class="sub">현재 위치 = 9월</div>
+      <div class="months"><div></div><div class="mrow"><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>1</span><span>2</span></div></div>
+      <div class="ph"><span class="lb">시장 수집</span><div class="lane"><div class="seg" style="left:0%;width:100%;background:#c9def5"></div></div></div>
+      <div class="ph"><span class="lb">기획 · 연결</span><div class="lane"><div class="seg" style="left:7%;width:36%;background:#0071e3"></div></div></div>
+      <div class="ph"><span class="lb">디자인 개발</span><div class="lane"><div class="seg" style="left:14%;width:44%;background:#7255e8"></div></div></div>
+      <div class="ph"><span class="lb">수주 · 오더</span><div class="lane"><div class="seg" style="left:43%;width:28%;background:#e08700"></div></div></div>
+      <div class="ph"><span class="lb">생산 · 입고</span><div class="lane"><div class="seg" style="left:57%;width:43%;background:#8e8e93"></div></div></div>
+      <div class="note">원본: 출시 일정표(GTM 캘린더) · 자동 연동</div>
+    </div>
+    <div class="card" data-g="ord-spec">
+      <h2>상품설명서 · 수주 준비</h2>
+      <div class="sub">수주 전에 사양이 먼저 확정됩니다</div>
+      <div class="hbar"><span class="lb">설명서 생성</span><div class="tr"><div class="fl" style="width:83%;background:#0b5bad"></div></div><span class="vl">24건</span></div>
+      <div class="hbar"><span class="lb">검토 대기</span><div class="tr"><div class="fl" style="width:12%;background:#e08700"></div></div><span class="vl">3건</span></div>
+      <div class="hbar"><span class="lb">수주 확정</span><div class="tr"><div class="fl" style="width:21%;background:#1a7f37"></div></div><span class="vl">6건</span></div>
+      <div class="note">소재·컬러·디자인 종류·그래픽의 공통 분류 기준으로 사양 문구를 자동 작성 → 담당자는 확인·수정만</div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+(function(){
+  var tabs=["home","market","category","color","material","design","order"];
+  function show(){
+    var h=(location.hash||"#home").slice(1);
+    if(tabs.indexOf(h)<0)h="home";
+    tabs.forEach(function(t){
+      document.getElementById("tab-"+t).classList.toggle("on",t===h);
+      document.querySelector('[data-tab="'+t+'"]').classList.toggle("on",t===h);
+    });
+    window.scrollTo(0,0);
+  }
+  window.addEventListener("hashchange",show); show();
+})();
+</script>
+
+<div class="gpop" id="gpop"></div>
+<script>
+var GUIDE={
+ /* ===== 화면(페이지) ===== */
+ "pg-home":{t:"홈 · 종합",tag:"화면",what:"시장 변화, 26FW 실제 판매, 27FW 기획·디자인 진행 상황을 한 화면에 모은 시작점입니다.",ins:"오늘 사람이 확인하고 결정해야 할 항목과 현재 진행 단계를 30초 안에 파악합니다.",dec:"빨간 항목부터 열어 반영·보류·제외 중 하나를 결정합니다."},
+ "pg-market":{t:"01 · 마켓 · 트렌드",tag:"화면",what:"중국·동남아 리포트와 인스타그램·경쟁사 자료에서 함께 나타난 시장 변화를 카테고리별로 보여줍니다.",ins:"시장에서 관심이 커졌지만 27FW 계획에는 아직 없는 상품을 찾습니다.",dec:"새 상품을 27FW에 추가할지, 기존 상품을 변형할지, 다음 달까지 더 볼지 정합니다."},
+ "pg-category":{t:"02 · 카테고리",tag:"화면",what:"26FW 현재 판매율, 최근 4주 판매 속도, 시장 변화를 라이프스타일·핏·아이템별로 함께 비교합니다.",ins:"지금 잘 팔리면서 더 빨라지는 조합은 확대 후보이고, 판매율과 속도가 모두 낮은 조합은 축소 후보입니다.",dec:"26FW 실제 판매를 근거로 27FW 상품 구성의 확대·보강·축소·신규 방향을 정합니다."},
+ "pg-color":{t:"03 · 컬러",tag:"화면",what:"104개 컬러를 26FW 판매율과 실제 판매 비중으로 비교해 27FW 방향을 제안합니다.",ins:"많이 팔린 컬러와, 판매량은 아직 작지만 빠르게 소진되는 숨은 기회를 구분합니다.",dec:"컬러별 확대·유지·축소·신규 방향과 컬러별 사이즈 수량 기준을 정합니다."},
+ "pg-material":{t:"04 · 소재 · 디자인",tag:"화면",what:"소재·컬러·디자인 종류·그래픽 네 가지 상품 특징별 26FW 판매 결과와 조합 성과를 보여줍니다.",ins:"공통 디자인 분류는 같은 형태의 상품을 같은 이름으로 비교하기 위한 기준입니다. 21개 상품군 아래 399개 구체 디자인명이 있습니다.",dec:"27FW에서 어떤 소재·컬러·디자인·그래픽 조합을 개발할지 정합니다."},
+ "pg-design":{t:"05 · 디자인 진행",tag:"화면",what:"기획한 상품이 1차 검토, 2차 검토, 샘플 개발 중 어디까지 왔는지 자동으로 보여줍니다.",ins:"담당 디자인이 없거나 일정이 늦는 항목을 매일 확인할 수 있습니다.",dec:"담당자를 배정하고 늦은 항목의 완료 일정을 다시 정합니다."},
+ "pg-order":{t:"06 · 오더 · 출시 일정",tag:"화면",what:"AI가 만든 상품·컬러·사이즈별 수량 초안과 수주·생산·입고·출시 일정을 함께 보여줍니다.",ins:"영업은 빈 표에서 시작하지 않고 26FW 판매 근거가 반영된 초안을 확인하고 조정합니다.",dec:"제안 수량을 승인·수정하고 수주와 출시 일정에 맞춰 진행할지 정합니다."},
+
+ /* ===== 홈 ===== */
+ "home-kpi":{t:"오늘의 핵심 숫자 4개",tag:"핵심 숫자",what:"새롭게 포착된 시장 변화, 27FW 계획에 빠진 기회, 디자인 진행률, 수량 초안 대기 건수를 한 줄에 보여줍니다.",ins:"빨간색은 오늘 검토가 필요한 항목, 주황색은 일정 확인이 필요한 항목입니다.",dec:"가장 영향이 큰 항목부터 세부 화면을 열어 담당자와 마감일을 정합니다."},
+ "home-loop":{t:"월간 순환 현황",tag:"업무 흐름",what:"수집 → 연결 → 개발 → 검증 → 오더 → 학습의 여섯 단계를 매월 반복하며 현재 위치와 완료 일자를 표시합니다.",ins:"한 단계가 늦어지면 디자인, 수주, 출시 일정도 함께 늦어질 수 있습니다.",dec:"이번 주에 끝낼 일과 다음 단계로 넘길 일을 구분합니다."},
+ "home-judge":{t:"오늘의 판단 (AI)",tag:"우선순위",what:"AI가 시장 변화, 26FW 판매 결과, 27FW 진행 상황을 함께 보고 오늘 결정할 세 가지를 근거와 함께 제시합니다.",ins:"발주 계획이 아니라 시즌 중인 26FW 실제 판매가 핵심 근거입니다. 시장 변화는 새로운 기회를 보완합니다.",dec:"항목별로 반영·보류·제외를 정하고, 반영할 항목은 해당 세부 화면에서 수량과 일정을 확정합니다."},
+ "home-signal":{t:"시장 관심 변화",tag:"시장",what:"최근 12주 동안 중국·동남아·인스타그램에서 함께 나타난 관심 항목 수를 계속 보이는 흐름과 새로 나타난 흐름으로 나눕니다.",ins:"여러 출처에서 오래 반복될수록 일시적 유행보다 실제 시장 변화일 가능성이 높습니다.",dec:"새 흐름은 관찰하고, 3개월 이상 이어진 흐름은 27FW 반영 후보로 올릴지 정합니다."},
+ "home-color":{t:"컬러 판정 요약",tag:"요약",what:"104개 컬러가 확대·유지·신규 관찰·축소 중 어디에 몇 개씩 속하는지 보여줍니다.",ins:"항목 수가 적어도 판매 비중이 큰 컬러라면 전체 매출과 재고에 미치는 영향이 큽니다.",dec:"03 컬러 화면에서 27FW 확대·축소 방향과 대체 컬러를 확정합니다."},
+ "home-minimap":{t:"카테고리 판매 미니맵",tag:"요약",what:"라이프스타일 4개와 핏 4개를 조합한 16개 칸의 26FW 현재 판매율입니다.",ins:"진한 칸은 현재 잘 팔리는 조합, 옅은 칸은 부진한 조합입니다.",dec:"판매가 좋은 조합은 27FW에 보강하고 부진한 조합은 축소할지 02 카테고리에서 정합니다."},
+ "home-perf":{t:"26FW 판매 현황",tag:"판매",what:"주간·월간 판매 대시보드에서 가져온 한국·중국·동남아의 26FW 현재 판매율입니다. 판매율은 준비한 수량 중 실제 판매된 비율입니다.",ins:"국가별 판매율 차이가 크면 같은 상품도 국가마다 구성과 수량을 다르게 볼 필요가 있습니다.",dec:"판매율이 낮은 국가의 원인을 카테고리·컬러별로 확인하고 다음 물량과 27FW 계획에 반영합니다."},
+
+ /* ===== 01 마켓 ===== */
+ "mk-kpi":{t:"시장 핵심 숫자",tag:"핵심 숫자",what:"중국의 새 아이템 수, 관심이 오른·내린 항목 수, 27FW 계획에 반영된 수를 보여줍니다.",ins:"27개 중 5개가 계획에 없다는 것은 시장 변화 중 아직 검토되지 않은 기회가 5개라는 뜻입니다.",dec:"5개를 이번 달에 검토할지, 다음 달까지 더 관찰할지 정합니다."},
+ "mk-signal":{t:"카테고리 관심도 — 8월 vs 9월",tag:"시장",what:"카테고리별 시장 관심을 지난달과 이번 달 막대로 비교합니다. 이번 달 막대가 더 크면 관심이 강해진 것입니다.",ins:"숏패딩 +38%, 발라클라바 +31%처럼 여러 달 연속 커지는 항목을 우선 봅니다.",dec:"관심 상승 항목은 27FW 계획에 추가할지 보고, 하락 항목은 26FW 실제 판매와 재고를 함께 확인합니다."},
+ "mk-gap":{t:"27FW에 빠진 기회 (AI)",tag:"우선순위",what:"시장 관심은 커졌지만 27FW 계획에는 없는 아이템을 중국 지속 기간, 경쟁사 출시 수 등 근거와 함께 보여줍니다.",ins:"'구성 없음'은 개발을 지금 시작하지 않으면 27FW 출시에 늦을 수 있다는 뜻입니다.",dec:"신규 라인 추가, 기존 라인 변형, 보류 중 하나를 정하고 추가 항목은 디자인 개발 단계에 등록합니다."},
+
+ /* ===== 02 카테고리 ===== */
+ "cat-matrix":{t:"라이프스타일 × 핏 판매표",tag:"판매",what:"라이프스타일 4개와 핏 4개를 조합한 16개 칸의 26FW 현재 판매율입니다. 진할수록 준비 수량이 빠르게 판매됐습니다.",ins:"Street는 Mid·Mega Over가 강하고 Slim은 전반적으로 약해, 현재 고객 반응이 여유 있는 핏에 모여 있습니다.",dec:"27FW 핏 구성을 Over·Mid 중심으로 보강하고 Slim을 얼마나 줄일지 정합니다."},
+ "cat-action":{t:"27FW 핵심 조합 제안 (AI)",tag:"제안",what:"26FW 판매율, 최근 4주 판매 속도, 시장 변화를 합쳐 조합별 27FW 확대·보강·축소·신규 방향을 제안합니다.",ins:"판매율이 높지만 전체 판매 비중이 작은 조합은 아직 물량이 작아 놓치고 있던 기회일 수 있습니다. 판매율과 최근 속도가 모두 낮으면 축소 후보입니다.",dec:"제안을 승인하거나 수정해 27FW 카테고리 구성과 수량 초안의 기준으로 사용합니다."},
+ "cat-item":{t:"아이템별 판매율과 판매 속도",tag:"26FW 판매",what:"막대는 26FW 현재 판매율, 점은 최근 4주 판매 속도입니다. 판매 속도 100은 시즌 평균과 같은 수준입니다.",ins:"판매율도 높고 점도 높은 아이템은 지금도 빠르게 팔립니다. 판매율이 낮고 점이 내려간 아이템은 재고 대응이 필요합니다.",dec:"26FW 추가 판매 대응과 27FW 확대·유지·축소 방향을 아이템별로 정합니다."},
+
+ /* ===== 03 컬러 ===== */
+ "col-quad":{t:"컬러 판매 위치도",tag:"26FW 판매",what:"가로는 전체 판매에서 해당 컬러가 차지하는 비중, 세로는 26FW 현재 판매율입니다. 원 크기는 실제 판매 수량입니다.",ins:"왼쪽 위는 비중은 작지만 잘 팔리는 숨은 기회, 오른쪽 위는 매출을 이끄는 핵심 컬러입니다. 오른쪽 아래는 비중은 큰데 판매율이 낮아 축소 검토가 필요합니다.",dec:"숨은 기회는 27FW 확대, 핵심 컬러는 유지, 낮은 반응은 제외 검토, 비중 대비 부진은 축소로 정합니다."},
+ "col-action":{t:"27FW 컬러 제안 (AI)",tag:"제안",what:"26FW 컬러별 판매율과 실제 판매 비중을 근거로 유지·확대·축소·신규 방향을 정리합니다.",ins:"모든 컬러를 같은 기준으로 비교하므로 포인트 컬러도 감이 아니라 판매 근거로 설명할 수 있습니다.",dec:"방향을 확정하면 상품·컬러·사이즈별 수량 초안에 반영하고 신규 컬러의 첫 수량을 정합니다."},
+
+ /* ===== 04 소재 · 디자인 ===== */
+ "mat-design":{t:"디자인별 시장 반응과 판매 결과",tag:"공통 분류",what:"21개 상품군 아래 399개 구체 디자인명을 공통 기준으로 쓰고, AI가 시장 이미지에서 읽은 등장 빈도와 26FW 판매율을 함께 보여줍니다.",ins:"예를 들어 Puffer Jacket은 디자인 종류, jacket은 상위 상품군입니다. oversized·Boxy는 형태, Relaxed·Slim은 핏이므로 따로 기록합니다.",dec:"디자인별 확대·보강·유지·축소·신규를 정하고 확대·신규 항목은 05 디자인 개발 단계로 넘깁니다."},
+ "mat-kpi":{t:"상품 특징별 26FW 판매율 1위",tag:"핵심 숫자",what:"소재·컬러·디자인 종류·그래픽 네 영역에서 26FW 판매율이 가장 높은 값을 보여줍니다.",ins:"각 영역의 1위는 27FW 기본 조합 후보지만, 네 요소를 실제로 합친 조합 성과도 함께 확인해야 합니다.",dec:"1위 조합을 기본안으로 쓸지, 2위 후보까지 변형으로 개발할지 정합니다."},
+ "mat-dist":{t:"소재·그래픽별 판매율",tag:"26FW 판매",what:"구스·덕·기모·빅 로고·무지처럼 같은 기준으로 분류한 상품 특징별 26FW 현재 판매율 순위입니다.",ins:"빅 로고 47%가 무지 55%보다 낮아, 로고가 클수록 잘 팔린다는 생각과 실제 결과가 다름을 보여줍니다.",dec:"27FW 소재 등급과 그래픽 비중을 어떤 방향으로 바꿀지 정합니다."},
+ "mat-win":{t:"성과가 좋은 조합 (AI)",tag:"조합",what:"소재·컬러·디자인 종류·그래픽 네 가지를 실제 상품 단위로 묶어 26FW 판매율이 높은 조합을 보여줍니다.",ins:"개별 특징 하나만 볼 때보다 어떤 네 가지가 함께 쓰였을 때 잘 팔렸는지 확인할 수 있습니다. 부진 상품도 한 요소씩 비교해 원인을 좁힙니다.",dec:"상위 조합을 27FW 기본 사양으로 쓸지, 한 요소만 바꾼 변형을 추가할지 정합니다."},
+
+ /* ===== 05 디자인 진행 ===== */
+ "dsg-pipe":{t:"27FW 디자인 개발 단계",tag:"진행",what:"기획 확정 48건이 1차 검토 → 2차 검토 → 샘플 개발 → 완료 단계로 몇 건씩 넘어갔는지 매일 보여줍니다.",ins:"32건에서 21건으로 줄어드는 1차와 2차 사이에서 가장 많은 항목이 멈춰 있습니다.",dec:"멈춘 단계에 검토 일정을 더 잡을지, 개발 항목 수를 줄여 집중할지 정합니다."},
+ "dsg-prog":{t:"카테고리별 진행률",tag:"진행",what:"2차 디자인 검토를 통과한 비율을 카테고리별로 보여줍니다.",ins:"다운·패딩은 80%로 앞서지만 ACC는 35%로 늦어 수주와 출시 일정에 영향을 줄 수 있습니다.",dec:"늦은 카테고리의 검토 일정을 당길지, 일부 상품을 다음 일정으로 넘길지 정합니다."},
+ "dsg-map":{t:"기획안별 디자인 진행 연결",tag:"진행",what:"각 기획안 옆에 현재 디자인 단계와 정상·지연·담당 없음 상태를 붙여 보여주는 중간 점검표입니다.",ins:"담당 디자인이 없는 항목과 평균 개발 기간을 넘긴 항목을 바로 찾을 수 있습니다.",dec:"담당자를 배정하고, 협력사 응답을 확인하고, 완료 일정을 다시 정합니다."},
+
+ /* ===== 06 오더 · 출시 일정 ===== */
+ "ord-draft":{t:"상품별 수량 초안 (AI)",tag:"수량",what:"26FW 판매 결과와 27FW 카테고리·컬러·소재 방향을 합쳐 상품·컬러별 제안 수량과 사이즈 비율을 만든 초안입니다.",ins:"영업은 빈 표에서 시작하지 않고 판매 근거가 반영된 수량을 확인하고 조정합니다.",dec:"상품별로 초안을 승인·수정·반려하고 확정된 건은 수주 단계로 넘깁니다."},
+ "ord-gtm":{t:"27FW 출시 준비 일정",tag:"일정",what:"시장 조사, 기획, 디자인 개발, 수주·오더, 생산·입고의 기간을 월별로 겹쳐 보여줍니다. GTM은 상품을 시장에 출시하기 위한 전체 일정이라는 뜻입니다.",ins:"10~11월처럼 디자인과 수주가 겹치는 시기가 가장 바쁩니다. 앞 단계가 늦으면 생산과 입고의 여유가 줄어듭니다.",dec:"수주 시작일을 유지할지, 늦은 카테고리를 뒤 일정으로 옮길지 정합니다."},
+ "ord-spec":{t:"상품설명서 · 수주 준비",tag:"준비",what:"소재·컬러·디자인 종류·그래픽의 공통 분류 기준을 이용해 상품 사양 문구를 자동으로 만든 결과와 검토 상태입니다.",ins:"설명서가 24건 만들어졌지만 수주 확정이 6건이면 현재 지연 구간은 담당자 검토 단계입니다.",dec:"검토 대기 3건을 이번 주에 끝낼지, 확정된 상품부터 영업 설명을 시작할지 정합니다."}
+};
+(function(){
+  var pop=document.getElementById("gpop"),tog=document.getElementById("gtog"),body=document.body;
+  var on=true;try{on=localStorage.getItem("tmd-guide")!=="off"}catch(e){}
+  function apply(){body.classList.toggle("guide",on);tog.classList.toggle("on",on);tog.innerHTML="<i>?</i>가이드 "+(on?"ON":"OFF");if(!on)pop.classList.remove("on")}
+  tog.addEventListener("click",function(){on=!on;try{localStorage.setItem("tmd-guide",on?"on":"off")}catch(e){}apply()});
+  apply();
+  var cur=null;
+  function render(k){
+    var g=GUIDE[k];if(!g)return false;
+    pop.innerHTML='<div class="gt">'+g.t+'<em>'+g.tag+'</em></div>'
+      +'<div class="gr what"><small>보여주는 것</small><p>'+g.what+'</p></div>'
+      +'<div class="gr ins"><small>인사이트</small><p>'+g.ins+'</p></div>'
+      +'<div class="gr dec"><small>여기서 결정</small><p>'+g.dec+'</p></div>';
+    return true;
+  }
+  function move(e){
+    var w=pop.offsetWidth,h=pop.offsetHeight,x=e.clientX+18,y=e.clientY+18;
+    if(x+w>window.innerWidth-12)x=e.clientX-w-18;
+    if(x<12)x=12;
+    if(y+h>window.innerHeight-12)y=Math.max(12,e.clientY-h-18);
+    pop.style.left=x+"px";pop.style.top=y+"px";
+  }
+  document.addEventListener("mouseover",function(e){
+    if(!on)return;
+    var el=e.target.closest("[data-g]");
+    if(!el){if(cur){cur=null;pop.classList.remove("on")}return}
+    if(el!==cur){cur=el;if(render(el.getAttribute("data-g"))){pop.classList.add("on");move(e)}}
+  });
+  document.addEventListener("mousemove",function(e){if(cur&&on)move(e)});
+  document.addEventListener("mouseleave",function(){cur=null;pop.classList.remove("on")});
+  window.addEventListener("hashchange",function(){cur=null;pop.classList.remove("on")});
+})();
+</script>
+</body>
+</html>

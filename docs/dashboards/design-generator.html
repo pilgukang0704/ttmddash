@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MLB AI DESIGN GENERATOR v5.10</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --surface:#f9f9f9;
+  --surface-low:#f3f3f3;
+  --surface-lowest:#ffffff;
+  --surface-container:#eeeeee;
+  --surface-high:#e8e8e8;
+  --on-surface:#1a1c1c;
+  --on-surface-var:#594136;
+  --secondary:#4c616c;
+  --outline:#8d7164;
+  --outline-var:#e2bfb0;
+  --primary:#b02e00;
+  --primary-cont:#ff6b40;
+  --primary-fixed:#ffdbd1;
+  --secondary-cont:#cfe6f2;
+  --on-secondary-cont:#526772;
+  --grad:linear-gradient(135deg,#b02e00 0%,#ff6b40 100%);
+  --col-div:rgba(226,191,176,0.38);
+}
+html,body{height:100%;background:var(--surface);color:var(--on-surface);font-family:'Manrope',sans-serif;font-size:14px;line-height:1.5}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-track{background:var(--surface-low)}
+::-webkit-scrollbar-thumb{background:var(--outline-var)}
+
+/* ── TOPBAR ── */
+.topbar{
+  height:52px;background:var(--surface-lowest);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 28px;position:sticky;top:0;z-index:50;
+  box-shadow:0 1px 0 var(--col-div);
+}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-dot{width:8px;height:8px;border-radius:50%;background:var(--grad)}
+.brand-name{font-size:15px;font-weight:800;letter-spacing:-0.02em}
+.brand-sub{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--outline);padding-left:12px;border-left:1px solid var(--outline-var)}
+.key-row{display:flex;align-items:center;gap:10px}
+.key-lbl{font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--outline)}
+.key-wrap{position:relative;display:flex;align-items:center}
+.key-wrap::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--outline-var);transition:background .15s}
+.key-wrap:focus-within::after{background:var(--primary)}
+.key-input{background:var(--surface-low);border:none;outline:none;padding:6px 8px 4px;font-size:13px;font-family:'Manrope',sans-serif;font-weight:600;color:var(--on-surface);width:220px}
+.key-input::placeholder{color:var(--outline);font-weight:400}
+
+/* ── MAIN LAYOUT ── */
+.layout{display:grid;grid-template-columns:288px 1fr;height:calc(100vh - 52px);overflow:hidden}
+
+/* ── LEFT PANEL ── */
+.left{background:var(--surface-lowest);display:flex;flex-direction:column;overflow:hidden;box-shadow:1px 0 0 var(--col-div)}
+.left-scroll{flex:1;overflow-y:auto;padding:18px 18px 0}
+.left-footer{padding:14px 18px;background:var(--surface-lowest);flex-shrink:0;box-shadow:0 -1px 0 var(--col-div)}
+
+.lbl{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--outline);margin-bottom:5px;margin-top:14px;display:block}
+.lbl:first-child{margin-top:0}
+
+/* Photo zone — contain so tall images show fully */
+.photo-zone{
+  background:var(--surface-low);
+  min-height:180px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:5px;cursor:pointer;position:relative;overflow:hidden;
+  border-bottom:2px solid var(--outline-var);transition:border-color .15s;
+}
+.photo-zone:hover{border-color:var(--outline)}
+.photo-zone.has{border-color:var(--primary);cursor:default}
+.photo-zone img{width:100%;height:auto;max-height:480px;object-fit:contain;object-position:center top;display:block}
+.pz-icon{font-size:22px;opacity:.25}
+.pz-txt{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--outline);text-align:center;line-height:1.8;pointer-events:none}
+.pz-clear{
+  position:absolute;top:6px;right:6px;background:rgba(26,28,28,.72);
+  border:none;color:#fff;font-size:11px;padding:3px 8px;border-radius:2px;
+  cursor:pointer;font-family:'Manrope',sans-serif;font-weight:700;display:none;
+}
+.photo-zone.has .pz-clear{display:block}
+.photo-zone.has .pz-txt,.photo-zone.has .pz-icon{display:none}
+
+/* toggles */
+/* category groups */
+#cat-row{display:flex;flex-direction:column;gap:4px}
+.cat-group{display:flex;align-items:flex-start;gap:6px}
+.cat-grp-lbl{font-size:8px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--outline);min-width:36px;padding-top:5px;flex-shrink:0;opacity:.7}
+.tog-wrap{display:flex;flex-wrap:wrap;gap:4px}
+.tog{padding:4px 9px;background:var(--surface-low);border:none;color:var(--secondary);border-radius:2px;font-size:10px;cursor:pointer;font-family:'Manrope',sans-serif;font-weight:700;letter-spacing:.08em;text-transform:uppercase;transition:all .12s}
+.tog:hover{background:var(--surface-container)}
+.tog.on{background:var(--primary-fixed);color:var(--primary);font-weight:800}
+
+/* ── TABS ── */
+.tab-bar{display:flex;gap:0;border-bottom:2px solid var(--col-div);margin-top:14px;flex-shrink:0}
+.tab-btn{flex:1;padding:6px 4px;background:none;border:none;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--outline);cursor:pointer;font-family:'Manrope',sans-serif;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s}
+.tab-btn.on{color:var(--primary);border-bottom-color:var(--primary)}
+.tab-pane{display:none;flex-direction:column;gap:6px;padding-top:10px}
+.tab-pane.on{display:flex}
+
+/* ── COLOR SLOTS ── */
+.color-slots{display:flex;flex-direction:column;gap:6px}
+.cslot{background:var(--surface-low);padding:7px 9px 5px;border-radius:2px;border-left:2px solid var(--outline-var)}
+.cslot.main-slot{border-left-color:var(--primary)}
+.cslot-label{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--outline);display:block;margin-bottom:4px}
+.cslot-row{display:flex;align-items:center;gap:6px}
+.cswatch-wrap{flex-shrink:0;position:relative;width:22px;height:22px;cursor:pointer}
+.cswatch-wrap input[type=color]{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;border:none;padding:0}
+.cswatch{width:22px;height:22px;border-radius:2px;border:1.5px solid var(--outline-var);background:var(--surface-container)}
+.cname-input{flex:1;background:transparent;border:none;border-bottom:1.5px solid var(--outline-var);outline:none;padding:2px 4px;font-size:11px;font-family:'Manrope',sans-serif;font-weight:600;color:var(--on-surface);min-width:0}
+.cname-input::placeholder{color:var(--outline);font-weight:400}
+.chex-disp{font-size:10px;font-weight:700;color:var(--outline);letter-spacing:.06em;min-width:42px;text-align:right}
+.cslot-clear{background:none;border:none;color:var(--outline);font-size:11px;cursor:pointer;padding:0 2px;line-height:1;flex-shrink:0}
+.cslot-clear:hover{color:var(--primary)}
+
+/* ── FABRIC CHIPS ── */
+.fab-group{margin-bottom:6px}
+.fab-group-lbl{font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--outline);margin-bottom:4px;display:block}
+.fab-chips{display:flex;flex-wrap:wrap;gap:3px}
+.fab-chip{padding:3px 7px;background:var(--surface-low);border:1.5px solid transparent;border-radius:2px;font-size:10px;font-weight:600;color:var(--secondary);cursor:pointer;font-family:'Manrope',sans-serif;transition:all .1s;letter-spacing:.04em}
+.fab-chip:hover{background:var(--surface-container)}
+.fab-chip.on{background:var(--primary-fixed);border-color:var(--primary);color:var(--primary)}
+.theme-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.ttog{padding:7px 6px;background:var(--surface-low);border:none;color:var(--secondary);border-radius:2px;font-size:10px;cursor:pointer;font-family:'Manrope',sans-serif;font-weight:700;letter-spacing:.1em;text-transform:uppercase;transition:all .12s;text-align:center;border-bottom:2px solid transparent}
+.ttog:hover{background:var(--surface-container)}
+.ttog[data-t=street].on{background:#fee2e2;color:#b91c1c;border-bottom-color:#b91c1c}
+.ttog[data-t=wellness].on{background:#d1fae5;color:#065f46;border-bottom-color:#059669}
+.ttog[data-t=sportive].on{background:#dbeafe;color:#1e40af;border-bottom-color:#2563eb}
+.ttog[data-t=outdoor].on{background:#d7f0d2;color:#1a5c14;border-bottom-color:#22863a}
+.ttog[data-t=oldmoney].on{background:#fef3c7;color:#92400e;border-bottom-color:#d97706}
+
+/* fields */
+.field-wrap{position:relative;display:flex;align-items:center;background:var(--surface-low)}
+.field-wrap::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--outline-var);transition:background .15s}
+.field-wrap:focus-within::after{background:var(--primary)}
+select,.f-input{width:100%;background:transparent;border:none;outline:none;padding:6px 9px 4px;font-size:11px;font-family:'Manrope',sans-serif;font-weight:600;color:var(--on-surface);appearance:none}
+select option{background:#fff}
+.f-input::placeholder{color:var(--outline);font-weight:400}
+.sel-arrow{position:absolute;right:8px;font-size:13px;color:var(--outline);pointer-events:none}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:5px}
+.f-textarea{width:100%;background:var(--surface-low);border:none;border-bottom:2px solid var(--outline-var);outline:none;padding:6px 9px;font-size:11px;font-family:'Manrope',sans-serif;font-weight:500;color:var(--on-surface);resize:none;height:42px;line-height:1.5;transition:border-color .15s}
+.f-textarea:focus{border-color:var(--primary)}
+.f-textarea::placeholder{color:var(--outline);font-weight:400}
+.err{background:#fff5f5;border-left:3px solid #b91c1c;color:#b91c1c;padding:8px 10px;font-size:13px;font-weight:700;margin-top:8px;display:none;line-height:1.6}
+
+/* Generate button */
+.gen-btn{width:100%;padding:12px;background:var(--grad);border:none;color:#fff;border-radius:3px;font-size:13px;cursor:pointer;font-family:'Manrope',sans-serif;font-weight:800;letter-spacing:.18em;text-transform:uppercase;transition:opacity .12s;box-shadow:0 4px 14px rgba(176,46,0,.25)}
+.gen-btn:hover:not(:disabled){opacity:.88}
+.gen-btn:disabled{background:var(--surface-high);color:var(--outline);cursor:not-allowed;box-shadow:none}
+
+/* ── RIGHT 3-COLUMN PANEL ── */
+.right{display:flex;flex-direction:column;overflow:hidden;background:var(--surface-low)}
+
+/* Progress bar */
+.prog-bar{display:none;padding:7px 20px;background:var(--surface-lowest);box-shadow:0 1px 0 var(--col-div);flex-shrink:0}
+.prog-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ps{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--outline)}
+.ps.done{color:#059669}
+.ps.active{color:var(--primary);animation:pulse 1s infinite}
+.ps.err{color:#b91c1c}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.ps-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+.ps-arr{color:var(--outline-var);font-size:13px;font-weight:300}
+
+/* 2-panel grid (prompt moved to drawer) */
+.panels-grid{flex:1;display:grid;grid-template-columns:1fr 1fr;overflow:hidden;gap:0}
+.out-col{display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--col-div);background:var(--surface)}
+.out-col:last-child{border-right:none}
+
+/* Column headers — no number badge */
+.col-hdr{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 16px;background:var(--surface-lowest);
+  border-bottom:2px solid var(--col-div);flex-shrink:0;
+}
+.col-hdr-title{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--on-surface)}
+.col-hdr-sub{font-size:11px;font-weight:500;color:var(--outline);letter-spacing:.05em;margin-left:auto}
+.col-body{flex:1;overflow:hidden;padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-height:0}
+.col-body-scroll{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+
+/* ── PROMPT DRAWER ── */
+.drawer-overlay{position:fixed;inset:0;background:rgba(26,28,28,.3);z-index:200;opacity:0;pointer-events:none;transition:opacity .25s}
+.drawer-overlay.open{opacity:1;pointer-events:auto}
+.prompt-drawer{
+  position:fixed;top:0;right:0;bottom:0;width:440px;max-width:90vw;
+  background:var(--surface-lowest);
+  box-shadow:-8px 0 36px rgba(0,0,0,.16);
+  z-index:201;display:flex;flex-direction:column;
+  transform:translateX(100%);transition:transform .3s cubic-bezier(.32,0,.32,1);
+}
+.prompt-drawer.open{transform:translateX(0)}
+.drawer-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;border-bottom:1px solid var(--col-div);flex-shrink:0;
+}
+.drawer-hdr-left{display:flex;align-items:center;gap:10px}
+.drawer-dot{width:7px;height:7px;border-radius:50%;background:var(--grad);flex-shrink:0}
+.drawer-title{font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.drawer-close{background:none;border:none;cursor:pointer;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--outline);font-size:16px;transition:background .12s}
+.drawer-close:hover{background:var(--surface-container);color:var(--on-surface)}
+.drawer-body{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
+
+/* Prompt open button */
+.prompt-open-btn{
+  padding:7px 14px;background:transparent;
+  border:1.5px solid var(--outline-var);color:var(--on-surface-var);
+  border-radius:3px;font-size:12px;font-weight:800;letter-spacing:.15em;
+  text-transform:uppercase;cursor:pointer;font-family:'Manrope',sans-serif;
+  transition:all .12s;display:flex;align-items:center;gap:6px;white-space:nowrap;
+}
+.prompt-open-btn:hover{border-color:var(--primary);color:var(--primary)}
+.prompt-open-btn .pill-dot{width:5px;height:5px;border-radius:50%;background:var(--primary);flex-shrink:0;display:none}
+.prompt-open-btn.has-prompt .pill-dot{display:block}
+
+/* Empty state */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;gap:8px;padding:20px}
+.empty-icon{font-size:30px;opacity:.1}
+.empty-eyebrow{font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--primary)}
+.empty-title{font-size:18px;font-weight:800;letter-spacing:-0.02em}
+.empty-sub{font-size:12px;font-weight:500;color:var(--secondary);line-height:1.8;max-width:220px}
+
+/* Loading spinner */
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:14px;padding:20px}
+.spin{width:24px;height:24px;border:2.5px solid var(--outline-var);border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-lbl{font-size:12px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--primary)}
+.loading-sub{font-size:12px;font-weight:500;color:var(--outline);letter-spacing:.05em;text-align:center}
+
+/* Section labels */
+.out-eyebrow{font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--primary);margin-bottom:3px}
+.out-title{font-size:16px;font-weight:800;letter-spacing:-0.01em}
+
+/* Prompt */
+.prompt-card{background:var(--surface-lowest);padding:16px 18px;border-left:3px solid;font-size:12px;font-weight:500;line-height:2;white-space:pre-wrap;word-break:break-word;color:var(--on-surface)}
+.prompt-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.copy-btn{padding:6px 14px;background:var(--grad);border:none;color:#fff;border-radius:3px;font-size:11px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;font-family:'Manrope',sans-serif;transition:opacity .12s;box-shadow:0 2px 8px rgba(176,46,0,.2)}
+.copy-btn:hover{opacity:.88}
+.out-meta{font-size:11px;font-weight:600;color:var(--outline);letter-spacing:.05em}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{padding:3px 8px;background:var(--secondary-cont);color:var(--on-secondary-cont);border-radius:2px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.chip.key{background:var(--primary-fixed);color:var(--primary)}
+.chip.ref{background:var(--surface-container);color:var(--secondary)}
+
+/* AI image panels */
+.ai-img-wrap{background:var(--surface-lowest);border-radius:3px;overflow:hidden;display:flex;justify-content:center;align-items:center;flex:1;min-height:0}
+.ai-img-wrap img{width:100%;height:100%;object-fit:contain;display:block}
+.gemini-badge{display:inline-flex;align-items:center;gap:5px;background:var(--primary-fixed);color:var(--primary);padding:4px 10px;border-radius:2px;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.gemini-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--primary);flex-shrink:0}
+.note-box{background:var(--surface-lowest);border-left:3px solid var(--outline-var);padding:10px 12px;font-size:12px;font-weight:600;color:var(--secondary);line-height:1.8}
+.err-box{background:#fff5f5;border-left:3px solid #b91c1c;padding:10px 12px;font-size:12px;font-weight:600;color:#7f1d1d;line-height:1.8}
+.err-box a{color:#b02e00;font-weight:800}
+.rule{width:100%;height:1px;background:var(--col-div);flex-shrink:0}
+.hint-txt{font-size:11px;font-weight:600;color:var(--outline);letter-spacing:.04em;line-height:1.8;flex-shrink:0}
+
+/* Download button */
+/* ── LIGHTBOX ── */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;overflow:hidden}
+.lightbox.open{opacity:1;pointer-events:auto}
+.lightbox-inner{position:relative;display:flex;align-items:center;justify-content:center;width:100%;height:100%;overflow:hidden;cursor:grab}
+.lightbox-inner.dragging{cursor:grabbing}
+.lightbox img{max-width:90vw;max-height:90vh;object-fit:contain;border-radius:4px;box-shadow:0 24px 80px rgba(0,0,0,.6);transform-origin:center center;transition:transform .08s ease-out;user-select:none;pointer-events:none}
+.lightbox-close{position:fixed;top:18px;right:22px;background:rgba(0,0,0,.4);border:none;color:#fff;font-size:24px;cursor:pointer;line-height:1;opacity:.8;transition:opacity .12s;z-index:501;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.lightbox-close:hover{opacity:1;background:rgba(0,0,0,.7)}
+.lightbox-zoom-hint{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.45);color:rgba(255,255,255,.7);font-size:11px;font-weight:600;padding:6px 14px;border-radius:20px;letter-spacing:.06em;pointer-events:none;z-index:501;font-family:'Manrope',sans-serif}
+.ai-img-wrap img{cursor:zoom-in}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;top:62px;left:50%;transform:translateX(-50%) translateY(-12px);
+  background:#1a1c1c;color:#fff;
+  padding:10px 18px 10px 14px;border-radius:4px;
+  font-size:13px;font-weight:700;letter-spacing:.04em;
+  display:flex;align-items:center;gap:10px;
+  box-shadow:0 6px 24px rgba(0,0,0,.28);
+  z-index:999;opacity:0;pointer-events:none;
+  transition:opacity .22s,transform .22s;
+  max-width:500px;
+}
+.toast.err-t{background:#7f1d1d;border-left:3px solid #ef4444}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+.toast-close{background:none;border:none;color:rgba(255,255,255,.6);font-size:16px;cursor:pointer;padding:0;line-height:1;flex-shrink:0}
+.toast-close:hover{color:#fff}
+
+/* ── 2×2 DESIGN GRID ── */
+.design-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:5px;flex:1;min-height:0}
+.d-cell{background:var(--surface-lowest);border-radius:3px;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:0}
+.d-cell img{width:100%;height:100%;object-fit:contain;cursor:zoom-in;display:block;flex:1;min-height:0}
+.cell-num{position:absolute;top:4px;left:4px;background:var(--grad);color:#fff;font-size:10px;font-weight:800;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:2;flex-shrink:0}
+.cell-loading{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px}
+.cell-spin{width:14px;height:14px;border:2px solid var(--outline-var);border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+.cell-status{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--outline)}
+.cell-err{font-size:9px;font-weight:600;color:#b91c1c;padding:8px;text-align:center;line-height:1.6}
+.d-cell-save{position:absolute;bottom:4px;right:4px;background:rgba(26,28,28,.65);border:none;color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;cursor:pointer;font-family:'Manrope',sans-serif;opacity:0;transition:opacity .15s;z-index:2}
+.d-cell:hover .d-cell-save{opacity:1}
+.dl-btn{padding:5px 12px;background:var(--surface-low);border:1.5px solid var(--outline-var);color:var(--on-surface-var);border-radius:2px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Manrope',sans-serif;transition:all .12s;letter-spacing:.08em;text-transform:uppercase}
+.dl-btn:hover{border-color:var(--primary);color:var(--primary)}
+</style>
+</head>
+<body>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <div class="lightbox-inner" id="lightbox-inner">
+    <img id="lightbox-img" src="" alt="">
+  </div>
+  <div class="lightbox-zoom-hint">스크롤로 확대/축소 · 드래그로 이동 · ESC로 닫기</div>
+</div>
+
+<!-- TOAST -->
+<div class="toast err-t" id="toast">
+  <span id="toast-msg">오류 메시지</span>
+  <button class="toast-close" onclick="hideErr()">✕</button>
+</div>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-dot"></div>
+    <span class="brand-name">MLB</span>
+    <span class="brand-sub">AI Design Generator v5.10 · 4×5 Colorways</span>
+  </div>
+  <div class="key-row">
+    <span class="key-lbl">Gemini Key</span>
+    <div class="key-wrap">
+      <input class="key-input" id="gemini-key" type="password" placeholder="AIza... (② ③ 이미지 생성용)">
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- ── LEFT PANEL ── -->
+  <div class="left">
+    <div class="left-scroll">
+
+      <span class="lbl">레퍼런스 사진</span>
+      <div class="photo-zone" id="pzone" onclick="document.getElementById('finput').click()">
+        <div class="pz-icon">📋</div>
+        <div class="pz-txt">Ctrl+V 붙여넣기<br>또는 클릭하여 파일 선택</div>
+        <img id="ppreview" src="" alt="ref" style="display:none">
+        <button class="pz-clear" onclick="clearPhoto(event)">✕ 제거</button>
+        <input type="file" id="finput" accept="image/*" style="display:none" onchange="handleFile(event)">
+      </div>
+
+      <span class="lbl">모델 성별</span>
+      <div class="tog-wrap" id="gender-row">
+        <button class="tog on" data-g="women" style="flex:1">👩 Women</button>
+        <button class="tog" data-g="men" style="flex:1">👨 Men</button>
+      </div>
+
+      <span class="lbl">카테고리</span>
+      <div id="cat-row">
+        <div class="cat-group">
+          <span class="cat-grp-lbl">Outer</span>
+          <div class="tog-wrap">
+            <button class="tog on" data-c="WJ">WJ</button>
+            <button class="tog" data-c="JP">JP</button>
+            <button class="tog" data-c="DJ">DJ</button>
+            <button class="tog" data-c="DV">DV</button>
+            <button class="tog" data-c="PD">PD</button>
+          </div>
+        </div>
+        <div class="cat-group">
+          <span class="cat-grp-lbl">Inner</span>
+          <div class="tog-wrap">
+            <button class="tog" data-c="MT">MT</button>
+            <button class="tog" data-c="HD">HD</button>
+            <button class="tog" data-c="TR">TR</button>
+            <button class="tog" data-c="TS">TS</button>
+            <button class="tog" data-c="TO">TO</button>
+            <button class="tog" data-c="RS">RS</button>
+            <button class="tog" data-c="PQ">PQ</button>
+            <button class="tog" data-c="OP">OP</button>
+            <button class="tog" data-c="KP">KP</button>
+            <button class="tog" data-c="KC">KC</button>
+          </div>
+        </div>
+        <div class="cat-group">
+          <span class="cat-grp-lbl">Bottom</span>
+          <div class="tog-wrap">
+            <button class="tog" data-c="PT">PT</button>
+            <button class="tog" data-c="WP">WP</button>
+            <button class="tog" data-c="SP">SP</button>
+            <button class="tog" data-c="SM">SM</button>
+            <button class="tog" data-c="LG">LG</button>
+            <button class="tog" data-c="SK">SK</button>
+            <button class="tog" data-c="DR">DR</button>
+          </div>
+        </div>
+        <div class="cat-group">
+          <span class="cat-grp-lbl">Denim</span>
+          <div class="tog-wrap">
+            <button class="tog" data-c="DK">DK</button>
+            <button class="tog" data-c="DD">DD</button>
+            <button class="tog" data-c="DP">DP</button>
+          </div>
+        </div>
+      </div>
+
+      <span class="lbl">LifeStyle</span>
+      <div class="theme-grid" id="theme-row">
+        <button class="ttog on" data-t="street">Street</button>
+        <button class="ttog" data-t="wellness">Wellness</button>
+        <button class="ttog" data-t="sportive">Sportive</button>
+        <button class="ttog" data-t="outdoor">Outdoor</button>
+        <button class="ttog" data-t="oldmoney" style="grid-column:span 2">Old Money (Premium)</button>
+      </div>
+
+      <!-- 탭 바 -->
+      <div class="tab-bar">
+        <button class="tab-btn on" data-tab="label" onclick="showTab('label')">라벨링</button>
+        <button class="tab-btn" data-tab="color" onclick="showTab('color')">컬러</button>
+        <button class="tab-btn" data-tab="fabric" onclick="showTab('fabric')">소재</button>
+      </div>
+
+      <!-- 라벨링 탭 -->
+      <div class="tab-pane on" id="tab-label">
+        <div class="fr" style="margin-top:0">
+          <div>
+            <span class="lbl" style="margin-top:5px;font-size:9px">핏</span>
+            <div class="field-wrap">
+              <select id="f-fit">
+                <option value="">—</option>
+                <option>Slim</option><option>Slim Crop</option><option>Slim Semi Crop</option>
+                <option>Regular</option><option>Comfortable</option><option>Comfortable Crop</option>
+                <option>Semi Over</option><option>Over</option><option>Over Crop</option>
+                <option>Mega Over</option><option>Max Over</option><option>Loose</option><option>Off Shoulder</option>
+              </select>
+              <span class="sel-arrow">▾</span>
+            </div>
+          </div>
+          <div>
+            <span class="lbl" style="margin-top:5px;font-size:9px">기장</span>
+            <div class="field-wrap">
+              <select id="f-len">
+                <option value="">—</option>
+                <option>Crop</option><option>Semi Crop</option><option>Short</option>
+                <option>Regular</option><option>Mid</option><option>Long</option>
+              </select>
+              <span class="sel-arrow">▾</span>
+            </div>
+          </div>
+          <div>
+            <span class="lbl" style="margin-top:5px;font-size:9px">칼라</span>
+            <div class="field-wrap">
+              <select id="f-col">
+                <option value="">—</option>
+                <option>Round</option><option>Hooded</option><option>Stand Neck</option>
+                <option>Half Zip Up</option><option>Zip Up</option><option>Y Neck</option>
+                <option>Collar</option><option>Open Collar</option><option>Off Shoulder</option><option>Rib Neck</option>
+              </select>
+              <span class="sel-arrow">▾</span>
+            </div>
+          </div>
+          <div>
+            <span class="lbl" style="margin-top:5px;font-size:9px">레이어</span>
+            <div class="field-wrap">
+              <select id="f-lay">
+                <option value="">—</option>
+                <option>No Layer</option><option>Single</option><option>Lining</option>
+                <option>2L</option><option>3L</option><option>Gore-Tex 3L</option><option>Padding</option>
+              </select>
+              <span class="sel-arrow">▾</span>
+            </div>
+          </div>
+          <div>
+            <span class="lbl" style="margin-top:5px;font-size:9px">중량</span>
+            <div class="field-wrap">
+              <select id="f-wt">
+                <option value="">—</option>
+                <option>Ultra Light (~80g)</option><option>Light (80~160g)</option>
+                <option>Mid (160~260g)</option><option>Mid-Heavy (260~360g)</option><option>Heavy (360g+)</option>
+              </select>
+              <span class="sel-arrow">▾</span>
+            </div>
+          </div>
+          <div>
+            <span class="lbl" style="margin-top:5px;font-size:9px">스트레치</span>
+            <div class="field-wrap">
+              <select id="f-str">
+                <option value="">—</option>
+                <option>O (Stretch)</option><option>X (No Stretch)</option>
+              </select>
+              <span class="sel-arrow">▾</span>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:6px">
+          <span class="lbl" style="font-size:9px">로고 / Graphic</span>
+          <div class="field-wrap">
+            <select id="f-logo">
+              <option value="">— Auto (테마 자동)</option>
+              <option>NY Small</option><option>NY Big</option><option>NY Mega</option>
+              <option>Monogram</option><option>Mono AOP</option>
+              <option>Lettering</option><option>Cursive</option>
+              <option>Back Big</option><option>Sleeve</option><option>No Logo</option>
+            </select>
+            <span class="sel-arrow">▾</span>
+          </div>
+        </div>
+        <div style="margin-top:6px">
+          <span class="lbl" style="font-size:9px">데니어</span>
+          <div class="field-wrap">
+            <input class="f-input" type="text" id="f-den" placeholder="20D, 50D, 100D...">
+          </div>
+        </div>
+        <div style="margin-top:6px">
+          <span class="lbl" style="font-size:9px">추가 디테일</span>
+          <textarea class="f-textarea" id="f-det" placeholder="특이사항, 추가 디자인 디테일..."></textarea>
+        </div>
+      </div>
+
+      <!-- 컬러 탭 -->
+      <div class="tab-pane" id="tab-color">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--col-div)">
+          <span style="font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--outline)">CAD 컬러웨이</span>
+          <div style="display:flex;gap:4px">
+            <button class="tog cw-tog" data-cw="3" onclick="setCwCount(3)">3컬러</button>
+            <button class="tog cw-tog on" data-cw="5" onclick="setCwCount(5)">5컬러</button>
+          </div>
+        </div>
+        <div class="color-slots">
+          <div class="cslot main-slot" id="cslot-0">
+            <span class="cslot-label">대표 컬러 · AI + Col1</span>
+            <div class="cslot-row">
+              <label class="cswatch-wrap"><input type="color" id="cpicker-0" value="#000000" oninput="onColorPick(0,this.value)"><div class="cswatch" id="cswatch-0"></div></label>
+              <input type="text" class="cname-input" id="cname-0" placeholder="예: Jet Black" oninput="COLOR_SLOTS[0].name=this.value.trim()">
+              <span class="chex-disp" id="chex-0">—</span>
+              <button class="cslot-clear" onclick="clearCSlot(0)">✕</button>
+            </div>
+          </div>
+          <div class="cslot" id="cslot-1">
+            <span class="cslot-label">Col2 · CAD Pool</span>
+            <div class="cslot-row">
+              <label class="cswatch-wrap"><input type="color" id="cpicker-1" value="#1a3a6b" oninput="onColorPick(1,this.value)"><div class="cswatch" id="cswatch-1"></div></label>
+              <input type="text" class="cname-input" id="cname-1" placeholder="예: Navy" oninput="COLOR_SLOTS[1].name=this.value.trim()">
+              <span class="chex-disp" id="chex-1">—</span>
+              <button class="cslot-clear" onclick="clearCSlot(1)">✕</button>
+            </div>
+          </div>
+          <div class="cslot" id="cslot-2">
+            <span class="cslot-label">Col3 · CAD Pool</span>
+            <div class="cslot-row">
+              <label class="cswatch-wrap"><input type="color" id="cpicker-2" value="#f5f0e8" oninput="onColorPick(2,this.value)"><div class="cswatch" id="cswatch-2"></div></label>
+              <input type="text" class="cname-input" id="cname-2" placeholder="예: Off-White" oninput="COLOR_SLOTS[2].name=this.value.trim()">
+              <span class="chex-disp" id="chex-2">—</span>
+              <button class="cslot-clear" onclick="clearCSlot(2)">✕</button>
+            </div>
+          </div>
+          <div class="cslot" id="cslot-3">
+            <span class="cslot-label">Col4 · CAD Pool</span>
+            <div class="cslot-row">
+              <label class="cswatch-wrap"><input type="color" id="cpicker-3" value="#8b1a1a" oninput="onColorPick(3,this.value)"><div class="cswatch" id="cswatch-3"></div></label>
+              <input type="text" class="cname-input" id="cname-3" placeholder="예: Burgundy" oninput="COLOR_SLOTS[3].name=this.value.trim()">
+              <span class="chex-disp" id="chex-3">—</span>
+              <button class="cslot-clear" onclick="clearCSlot(3)">✕</button>
+            </div>
+          </div>
+          <div class="cslot" id="cslot-4">
+            <span class="cslot-label">Col5 · CAD Pool</span>
+            <div class="cslot-row">
+              <label class="cswatch-wrap"><input type="color" id="cpicker-4" value="#5a8a5a" oninput="onColorPick(4,this.value)"><div class="cswatch" id="cswatch-4"></div></label>
+              <input type="text" class="cname-input" id="cname-4" placeholder="예: Olive Green" oninput="COLOR_SLOTS[4].name=this.value.trim()">
+              <span class="chex-disp" id="chex-4">—</span>
+              <button class="cslot-clear" onclick="clearCSlot(4)">✕</button>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:8px;font-size:9px;color:var(--outline);line-height:1.6">Col2~Col5 정의된 컬러에서 랜덤으로 CAD Col2~Col5 배정 (위 2개 + 아래 3개)</div>
+      </div>
+
+      <!-- 소재 탭 -->
+      <div class="tab-pane" id="tab-fabric">
+        <div style="margin-bottom:6px">
+          <span class="lbl" style="font-size:9px">선택된 소재</span>
+          <div class="field-wrap"><input class="f-input" type="text" id="f-fab" placeholder="클릭해서 선택 또는 직접 입력..." oninput="syncFabInput()"></div>
+        </div>
+        <div id="fabric-chips-area"></div>
+      </div>
+
+      <!-- 공통: 기능 필드 (f-fn 은 라벨링 탭 밖에서도 필요) -->
+      <input type="hidden" id="f-fn" value="">
+      <input type="hidden" id="f-col2" value="">
+
+      <div style="height:16px"></div>
+    </div>
+
+    <div class="left-footer">
+      <div style="display:flex;gap:8px">
+        <button class="prompt-open-btn" id="prompt-open-btn" onclick="openOrBuildPrompt()">
+          <span class="pill-dot"></span>Prompt
+        </button>
+        <button class="gen-btn" id="gen-btn" onclick="runAll()" style="flex:1">Generate All</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PROMPT DRAWER ── -->
+  <div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+  <div class="prompt-drawer" id="prompt-drawer">
+    <div class="drawer-hdr">
+      <div class="drawer-hdr-left">
+        <div class="drawer-dot"></div>
+        <span class="drawer-title">Prompt 뷰어</span>
+      </div>
+      <button class="drawer-close" onclick="closeDrawer()">✕</button>
+    </div>
+    <div class="drawer-body" id="drawer-body">
+      <div class="empty" id="pe-prompt">
+        <div class="empty-icon">✦</div>
+        <div class="empty-eyebrow">Prompt Generator</div>
+        <div class="empty-title">나노바나나 프롬프트</div>
+        <div class="empty-sub">위닝 포뮬라 입력 후<br>Generate All 실행</div>
+      </div>
+      <div id="pr-result" style="display:none;flex-direction:column;gap:12px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:8px">
+          <div>
+            <div class="out-eyebrow" id="pr-eyebrow">—</div>
+            <div class="out-title" id="pr-title">AI 이미지 생성</div>
+          </div>
+          <button class="copy-btn" id="copy-btn" onclick="copyPrompt()">Copy</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span class="out-meta" id="pr-meta"></span>
+        </div>
+        <div class="chips" id="pr-chips"></div>
+        <div class="rule"></div>
+        <div class="prompt-card" id="pr-text" style="border-color:var(--primary)"></div>
+        <div class="hint-txt">↑ 복사해서 NanoBanana에 레퍼런스 사진과 함께 붙여넣으세요</div>
+      </div>
+
+      <!-- CAD Prompt Sections -->
+      <div id="pr-cad-section" style="display:none;flex-direction:column;gap:12px">
+        <div class="rule"></div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:8px">
+          <div>
+            <div class="out-eyebrow" style="color:var(--secondary)">Step 3-A · 디자인 분석</div>
+            <div class="out-title" style="font-size:14px">Design Analysis Prompt</div>
+          </div>
+          <button class="copy-btn" id="copy-cad-a-btn" onclick="copyCadAnalyze()">Copy</button>
+        </div>
+        <div class="hint-txt">AI 디자인 이미지를 넣고 스펙 텍스트를 추출하는 프롬프트</div>
+        <div class="prompt-card" id="pr-cad-analyze" style="border-color:var(--secondary);font-size:11px;line-height:1.7"></div>
+        <div class="rule"></div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:8px">
+          <div>
+            <div class="out-eyebrow" style="color:var(--secondary)">Step 3-B · CAD 생성</div>
+            <div class="out-title" style="font-size:14px">CAD Generation Prompt</div>
+          </div>
+          <button class="copy-btn" id="copy-cad-b-btn" onclick="copyCadGen()">Copy</button>
+        </div>
+        <div class="hint-txt" id="pr-cad-gen-meta">3-A 분석 결과 + 컬러웨이 지시어 포함 프롬프트 (Generate All 실행 시 분석 결과 자동 삽입)</div>
+        <div class="prompt-card" id="pr-cad-gen" style="border-color:var(--secondary);font-size:11px;line-height:1.7"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RIGHT: 2-COLUMN OUTPUT ── -->
+  <div class="right">
+
+    <!-- Progress -->
+    <div class="prog-bar" id="prog-bar">
+      <div class="prog-row">
+        <div class="ps" id="ps1"><div class="ps-dot"></div>프롬프트 생성</div>
+        <span class="ps-arr">→</span>
+        <div class="ps" id="ps2"><div class="ps-dot"></div>AI 디자인 이미지</div>
+        <span class="ps-arr">→</span>
+        <div class="ps" id="ps3"><div class="ps-dot"></div>2D CAD 변환</div>
+      </div>
+    </div>
+
+    <!-- 2 columns -->
+    <div class="panels-grid">
+
+      <!-- AI DESIGN IMAGE -->
+      <div class="out-col">
+        <div class="col-hdr">
+          <span class="col-hdr-title">AI Design Image</span>
+          <span class="col-hdr-sub">Gemini · 패션 디자인</span>
+        </div>
+        <div class="col-body" id="col-body-2">
+          <div class="empty" id="pe-design">
+            <div class="empty-icon">◈</div>
+            <div class="empty-eyebrow">Gemini Flash × 4</div>
+            <div class="empty-title">AI 디자인 프리뷰</div>
+            <div class="empty-sub">Gemini API Key 입력 후 생성<br>4가지 디자인 병렬 생성</div>
+          </div>
+          <!-- Grid result -->
+          <div id="design-grid-wrap" style="display:none;flex-direction:column;gap:8px;flex:1;min-height:0">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-shrink:0;flex-wrap:wrap;gap:6px">
+              <div>
+                <div class="out-eyebrow" id="design-eyebrow">Gemini AI Design</div>
+                <div class="out-title" id="design-title">AI Design × 4</div>
+              </div>
+              <div style="display:flex;gap:6px;align-items:center">
+                <div class="gemini-badge" id="design-badge">Gemini × 4</div>
+                <button class="dl-btn" onclick="dlAllDesigns()">Save All</button>
+              </div>
+            </div>
+            <div class="design-grid" id="design-img-grid">
+              <div class="d-cell" id="d-cell-0"><div class="cell-loading"><div class="cell-spin"></div><div class="cell-status">대기 중</div></div></div>
+              <div class="d-cell" id="d-cell-1"><div class="cell-loading"><div class="cell-spin"></div><div class="cell-status">대기 중</div></div></div>
+              <div class="d-cell" id="d-cell-2"><div class="cell-loading"><div class="cell-spin"></div><div class="cell-status">대기 중</div></div></div>
+              <div class="d-cell" id="d-cell-3"><div class="cell-loading"><div class="cell-spin"></div><div class="cell-status">대기 중</div></div></div>
+            </div>
+            <div class="hint-txt">각 이미지 클릭 시 확대 · 4개 이미지 기반으로 CAD 자동 생성</div>
+          </div>
+          <!-- No key -->
+          <div id="design-nokey" style="display:none;flex-direction:column;gap:10px">
+            <div class="note-box">
+              Gemini API Key가 없습니다.<br>
+              상단에 키 입력 후 재실행하면 AI 디자인 이미지가 생성됩니다.
+            </div>
+          </div>
+          <!-- Error -->
+          <div class="err-box" id="design-err" style="display:none"></div>
+        </div>
+      </div>
+
+      <!-- CAD FLAT -->
+      <div class="out-col">
+        <div class="col-hdr">
+          <span class="col-hdr-title">2D CAD Flat</span>
+          <span class="col-hdr-sub">Gemini · 기술 도면</span>
+        </div>
+        <div class="col-body" id="col-body-3">
+          <div class="empty" id="pe-cad">
+            <div class="empty-icon">◻</div>
+            <div class="empty-eyebrow">Technical Drawing × 4</div>
+            <div class="empty-title">2D CAD Flat Sketch</div>
+            <div class="empty-sub">AI 디자인 완료 후<br>4개 CAD 자동 변환</div>
+          </div>
+          <!-- Grid result -->
+          <div id="cad-grid-wrap" style="display:none;flex-direction:column;gap:8px;flex:1;min-height:0">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-shrink:0;flex-wrap:wrap;gap:6px">
+              <div>
+                <div class="out-eyebrow">2D CAD Flat Sketch</div>
+                <div class="out-title" id="cad-title">Technical Drawing × 4</div>
+              </div>
+              <div style="display:flex;gap:6px;align-items:center">
+                <div class="gemini-badge">CAD × 4</div>
+                <button class="dl-btn" onclick="dlAllCAD()">Save All</button>
+              </div>
+            </div>
+            <div class="design-grid" id="cad-img-grid">
+              <div class="d-cell" id="c-cell-0"><div class="cell-loading"><div class="cell-spin"></div><div class="cell-status">대기 중</div></div></div>
+              <div class="d-cell" id="c-cell-1"><div class="cell-loading"><div class="cell-spin"></div><div class="cell-status">대기 중</div></div></div>
+              <div class="d-cell" id="c-cell-2"><div class="cell-loading"><div class="cell-spin"></div><div class="cell-status">대기 중</div></div></div>
+              <div class="d-cell" id="c-cell-3"><div class="cell-loading"><div class="cell-spin"></div><div class="cell-status">대기 중</div></div></div>
+            </div>
+            <div class="hint-txt">각 CAD는 5 Colorways 포함 (위 2 + 아래 3) · 클릭 시 확대</div>
+          </div>
+          <!-- No design yet -->
+          <div id="cad-nodesign" style="display:none;flex-direction:column;gap:10px">
+            <div class="note-box">
+              AI 디자인 이미지가 생성되어야 2D CAD 변환이 가능합니다.<br>
+              Gemini Key 입력 후 재실행하세요.
+            </div>
+          </div>
+          <!-- Error -->
+          <div class="err-box" id="cad-err" style="display:none"></div>
+        </div>
+      </div>
+
+    </div><!-- /panels-grid -->
+  </div><!-- /right -->
+
+</div><!-- /layout -->
+
+<script>
+// ── STATE ──
+let photoB64=null, photoType=null, cat='WJ', theme='street', gender='women';
+let cadCwCount=5; // 3 or 5
+let curPrompt='', cadImgSrc=null;
+let curCadAnalyzePrompt='', curCadGenPrompt='';
+let designImages=[null,null,null,null]; // {b64,mimeType} × 4
+let cadImgSrcs=[null,null,null,null];
+// legacy aliases (for single-image functions still referenced)
+let designImgB64=null, designMimeType='image/png';
+
+const THEME_C={street:'#b91c1c',wellness:'#059669',sportive:'#2563eb',outdoor:'#22863a',oldmoney:'#d97706'};
+const THEME_L={street:'STREET',wellness:'WELLNESS',sportive:'SPORTIVE',outdoor:'OUTDOOR',oldmoney:'OLD MONEY'};
+const CAT_L={
+  WJ:'Windbreaker',JP:'Jacket',DJ:'Down Jacket',DV:'Down Vest',PD:'Padding Jacket',
+  MT:'Sweatshirt',HD:'Hoodie',TR:'Track Jacket',TS:'T-Shirt',TO:'Sleeveless Top',
+  RS:'Running Shirt',PQ:'Polo Shirt',OP:'Open Collar Shirt',KP:'Knit Pullover',KC:'Knit Cardigan',
+  PT:'Pants',WP:'Wide Pants',SP:'Sweatpants',SM:'Shorts',SK:'Skirt',DR:'Dress',
+  DD:'Denim Dress',DK:'Denim Jacket',DP:'Denim Pants',
+  LG:'Leggings'
+};
+const BOTTOM_CATS=['PT','WP','SP','SM','SK','DR','DD','DP','LG'];
+const CAT_FIXED={
+  TR:'full zip-up front closure',
+  HD:'pullover hoodie with drawstring hood',
+  KC:'open-front cardigan with button or zip closure',
+  DV:'sleeveless vest silhouette, no sleeves',
+  TO:'sleeveless, no sleeves',
+  RS:'sleeveless or short sleeve athletic cut',
+  SK:'skirt, no pants',
+  DR:'full dress silhouette'
+};
+
+// ── TABS ──
+function showTab(t){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.toggle('on',p.id==='tab-'+t));
+}
+function setCwCount(n){
+  cadCwCount=n;
+  document.querySelectorAll('.cw-tog').forEach(b=>b.classList.toggle('on',parseInt(b.dataset.cw)===n));
+}
+
+
+// ── COLOR SLOTS ──
+let COLOR_SLOTS=[
+  {active:false,hex:'',name:''},
+  {active:false,hex:'',name:''},
+  {active:false,hex:'',name:''},
+  {active:false,hex:'',name:''},
+  {active:false,hex:'',name:''}
+];
+function onColorPick(i,hex){
+  COLOR_SLOTS[i].active=true;
+  COLOR_SLOTS[i].hex=hex;
+  const sw=document.getElementById('cswatch-'+i);
+  if(sw)sw.style.background=hex;
+  const hd=document.getElementById('chex-'+i);
+  if(hd)hd.textContent=hex.toUpperCase();
+}
+function clearCSlot(i){
+  COLOR_SLOTS[i]={active:false,hex:'',name:''};
+  const sw=document.getElementById('cswatch-'+i);
+  if(sw)sw.style.background='';
+  const hd=document.getElementById('chex-'+i);
+  if(hd)hd.textContent='—';
+  const ni=document.getElementById('cname-'+i);
+  if(ni)ni.value='';
+}
+function getMainColorStr(){
+  const s=COLOR_SLOTS[0];
+  if(!s.active)return '';
+  return s.name?`${s.name} (${s.hex})`:s.hex;
+}
+function getCadColorways(){
+  const col1=getMainColorStr();
+  const pool=COLOR_SLOTS.slice(1).filter(s=>s.active).map(s=>s.name?`${s.name} (${s.hex})`:s.hex);
+  const shuffled=[...pool].sort(()=>Math.random()-.5);
+  return{col1,col2:shuffled[0]||null,col3:shuffled[1]||null,col4:shuffled[2]||null,col5:shuffled[3]||null};
+}
+
+// ── FABRIC CHIPS ──
+const ALL_FABRICS={
+  'Woven 우븐':      ['Nylon','Polyester','Cotton','Ripstop','Twill','Oxford','Taffeta','Poplin','Canvas','Denim','Corduroy','Velvet','Satin','Chiffon','Crepe'],
+  'Knit 니트':       ['Jersey','Fleece','French Terry','Piqué','Rib Knit','Interlock','Mesh','Ponte','Scuba','Double Knit','Compression Knit','Tricot','Waffle Knit','Spacer Knit'],
+  'Outdoor 아웃도어': ['Softshell','Hardshell','Gore-Tex','Pertex','Primaloft','Windstopper','Microfiber','Stretch Woven','3L Laminate','Coolmax'],
+  'Premium 프리미엄': ['Cashmere','Merino Wool','Mohair','Silk Blend','Modal','Bamboo','Viscose','Lyocell','Linen','Fine Wool','Tweed'],
+  'Special 특수':    ['Leather','Faux Leather','Neoprene','Reflective','Bonded Fleece','Waxed Cotton','Velboa','PU Coating']
+};
+let selectedFabrics=[];
+function initFabricChips(){
+  const area=document.getElementById('fabric-chips-area');
+  if(!area)return;
+  area.innerHTML='';
+  Object.entries(ALL_FABRICS).forEach(([grp,items])=>{
+    const g=document.createElement('div');g.className='fab-group';
+    g.innerHTML=`<span class="fab-group-lbl">${grp}</span><div class="fab-chips">${items.map(n=>`<button class="fab-chip" data-fab="${n}" onclick="onFabClick(this)">${n}</button>`).join('')}</div>`;
+    area.appendChild(g);
+  });
+}
+function onFabClick(btn){
+  const n=btn.dataset.fab;
+  if(btn.classList.contains('on')){
+    btn.classList.remove('on');
+    selectedFabrics=selectedFabrics.filter(f=>f!==n);
+  } else {
+    btn.classList.add('on');
+    selectedFabrics.push(n);
+  }
+  const inp=document.getElementById('f-fab');
+  if(inp)inp.value=selectedFabrics.join(', ');
+}
+function syncFabInput(){
+  const inp=document.getElementById('f-fab');
+  if(!inp)return;
+  const vals=inp.value.split(',').map(s=>s.trim()).filter(Boolean);
+  selectedFabrics=vals;
+  document.querySelectorAll('.fab-chip').forEach(b=>{
+    b.classList.toggle('on',vals.includes(b.dataset.fab));
+  });
+}
+initFabricChips();
+
+// ── LOGO SPEC AUTO ──
+const LOGO_TECH={
+  street:  {tech:'bold embroidery / rubber screen print / chenille patch',tone:'high contrast'},
+  wellness:{tech:'heat transfer / tone-on-tone embroidery / jacquard',tone:'tone-on-tone'},
+  sportive:{tech:'rubber print / sublimation print / woven patch',tone:'contrasting'},
+  outdoor: {tech:'woven badge / embroidery / heat-bond',tone:'muted tone-on-tone'},
+  oldmoney:{tech:'satin stitch / jacquard monogram / micro embroidery',tone:'full tone-on-tone'}
+};
+const LOGO_POS={
+  'NY Small':   'small NY logo on left chest',
+  'NY Big':     'large NY logo center chest',
+  'NY Mega':    'oversized NY logo full chest',
+  'Monogram':   'MLB monogram logo left chest',
+  'Mono AOP':   'MLB monogram all-over print pattern',
+  'Lettering':  'MLB lettering across chest',
+  'Cursive':    'cursive script MLB logo left chest',
+  'Back Big':   'large NY logo center back',
+  'Sleeve':     'NY logo on left sleeve',
+  'No Logo':    ''
+};
+function buildLogoSpec(f){
+  const sel=f.logo;
+  if(sel==='No Logo')return '';
+  const lt=LOGO_TECH[f.theme]||LOGO_TECH.street;
+  if(sel&&LOGO_POS[sel]!==undefined){
+    if(!LOGO_POS[sel])return '';
+    return `${LOGO_POS[sel]}, ${lt.tech}, ${lt.tone}`;
+  }
+  if(BOTTOM_CATS.includes(f.cat)) return `NY small logo on outer left thigh (NOT on chest), ${lt.tech}, ${lt.tone}`;
+  return `NY logo left chest, ${lt.tech}, ${lt.tone}`;
+}
+
+// ── PHOTO ──
+document.addEventListener('paste',e=>{
+  for(const item of(e.clipboardData?.items||[])){
+    if(item.type.startsWith('image/')){
+      e.preventDefault();
+      loadPhoto(item.getAsFile());
+      break;
+    }
+  }
+});
+function handleFile(e){if(e.target.files[0])loadPhoto(e.target.files[0])}
+function loadPhoto(file){
+  const r=new FileReader();
+  r.onload=ev=>{
+    photoB64=ev.target.result.split(',')[1];
+    photoType=file.type||'image/jpeg';
+    const img=document.getElementById('ppreview');
+    img.src=ev.target.result;
+    img.style.display='block';
+    document.getElementById('pzone').classList.add('has');
+  };
+  r.readAsDataURL(file);
+}
+function clearPhoto(e){
+  e.stopPropagation();photoB64=null;photoType=null;
+  const img=document.getElementById('ppreview');
+  img.src='';
+  img.style.display='none';
+  document.getElementById('pzone').classList.remove('has');
+  document.getElementById('finput').value='';
+}
+
+// ── TOGGLES ──
+document.getElementById('gender-row').addEventListener('click',e=>{
+  const b=e.target.closest('.tog');if(!b)return;
+  document.querySelectorAll('#gender-row .tog').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');gender=b.dataset.g;
+});
+document.getElementById('cat-row').addEventListener('click',e=>{
+  const b=e.target.closest('.tog[data-c]');if(!b)return;
+  document.querySelectorAll('#cat-row .tog').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');cat=b.dataset.c;
+});
+document.getElementById('theme-row').addEventListener('click',e=>{
+  const b=e.target.closest('.ttog');if(!b)return;
+  document.querySelectorAll('#theme-row .ttog').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');theme=b.dataset.t;
+});
+
+// ── PROGRESS ──
+function prog(id,state){const el=document.getElementById('ps'+id);if(el)el.className='ps '+(state||'')}
+function showProg(){document.getElementById('prog-bar').style.display='block';[1,2,3].forEach(i=>prog(i,''))}
+
+// ── LIGHTBOX with scroll zoom + drag ──
+let lbScale=1, lbTx=0, lbTy=0, lbDragging=false, lbDragStart={x:0,y:0};
+
+function openLightbox(src){
+  lbScale=1; lbTx=0; lbTy=0;
+  const img=document.getElementById('lightbox-img');
+  img.src=src;
+  applyLbTransform();
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeLightbox(){
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow='';
+}
+function applyLbTransform(){
+  document.getElementById('lightbox-img').style.transform=
+    `translate(${lbTx}px,${lbTy}px) scale(${lbScale})`;
+}
+
+// Scroll to zoom
+document.getElementById('lightbox').addEventListener('wheel',e=>{
+  if(!document.getElementById('lightbox').classList.contains('open'))return;
+  e.preventDefault();
+  const delta=e.deltaY>0?-0.12:0.12;
+  lbScale=Math.min(Math.max(lbScale+delta,0.5),5);
+  applyLbTransform();
+},{passive:false});
+
+// Drag to pan
+const lbInner=document.getElementById('lightbox-inner');
+lbInner.addEventListener('mousedown',e=>{
+  if(e.target===lbInner||e.target===document.getElementById('lightbox-img')){
+    lbDragging=true;
+    lbDragStart={x:e.clientX-lbTx,y:e.clientY-lbTy};
+    lbInner.classList.add('dragging');
+    e.preventDefault();
+  }
+});
+document.addEventListener('mousemove',e=>{
+  if(!lbDragging)return;
+  lbTx=e.clientX-lbDragStart.x;
+  lbTy=e.clientY-lbDragStart.y;
+  applyLbTransform();
+});
+document.addEventListener('mouseup',()=>{
+  lbDragging=false;
+  lbInner.classList.remove('dragging');
+});
+
+// Click backdrop (not image) to close — DISABLED, use ESC or X only
+// document.getElementById('lightbox').addEventListener('click', ...)
+
+// Double-click to reset zoom
+lbInner.addEventListener('dblclick',()=>{
+  lbScale=1;lbTx=0;lbTy=0;applyLbTransform();
+});
+
+
+function openDrawer(){
+  document.getElementById('drawer-overlay').classList.add('open');
+  document.getElementById('prompt-drawer').classList.add('open');
+}
+function openOrBuildPrompt(){
+  const f=F();
+  if(!curPrompt||document.getElementById('pr-result').style.display==='none'){
+    curPrompt=buildPrompt(f);
+    renderPrompt(f,curPrompt);
+    renderCadPrompts(f);
+  } else {
+    openDrawer();
+  }
+}
+function closeDrawer(){
+  document.getElementById('drawer-overlay').classList.remove('open');
+  document.getElementById('prompt-drawer').classList.remove('open');
+}
+// ESC key closes drawer and lightbox
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDrawer();closeLightbox();}});
+
+
+function F(){return{
+  cat,theme,
+  fit:v('f-fit'),len:v('f-len'),col:v('f-col'),lay:v('f-lay'),
+  fn:v('f-fn'),fab:v('f-fab'),den:v('f-den'),wt:v('f-wt'),str:v('f-str'),
+  logo:v('f-logo'),det:v('f-det'),
+  cadColors:getCadColorways()
+}}
+function v(id){const el=document.getElementById(id);return el?el.value.trim():''}
+
+// ── MLB DNA ──
+const DNA={
+  street:{
+    expression:'cool indifferent, urban-confident, hip-hop energy',
+    bg:(()=>{const r=Math.random();return r<0.5?'urban concrete wall / graffiti alley / NYC downtown street, bright midday sunlight, clear blue sky':'urban concrete wall / graffiti alley / NYC downtown street, golden hour afternoon light, warm sunlight';})(),
+    mood:'edgy, bold, NYC street culture, effortlessly cool streetwear energy',
+    fabricNote:'',
+    styleNote:'oversized silhouette, streetwear stack, chunky sneakers',
+    colorPalette:[
+      'Urban Utility — Slate Blue (#6B7280) shell, Rust Orange (#B45309) accent',
+      'Vintage Archive — Deep Teal (#0E7490) shell, Pale Yellow (#FDE68A) accent',
+      'Graphite Black — Graphite (#374151) shell, Neon Green (#4ADE80) accent',
+      'Concrete Mono — Jet Black (#1A1A1A) shell, Off-White (#EBEBEB) accent',
+      'Army Surplus — Olive Khaki (#6B6F47) shell, Caramel Tan (#C68642) accent'
+    ]
+  },
+  wellness:{
+    expression:'serene, naturally confident, soft athletic glow',
+    bg:'morning light minimal studio / clean park path / soft natural daylight',
+    mood:'clean health, premium everyday active, fashion-forward athleisure',
+    fabricNote:'',
+    styleNote:'fitted silhouette, clean minimal accessories, wellness-chic',
+    colorPalette:[
+      'Oat Milk & Sage — Oat Milk (#E7DDCC) shell, Sage Green (#667B66) accent',
+      'Digital Lavender — Lavender (#A29BFE) shell, Mineral Grey (#9D9D9D) accent',
+      'Soft Blush — Blush Rose (#F4C2C2) shell, Warm Sand (#D4B896) accent',
+      'Sky Clarity — Sky Blue (#87CEEB) shell, Crisp White (#F8F8F8) accent',
+      'Matcha Glow — Matcha Green (#A8C686) shell, Ivory (#FAF7F0) accent'
+    ]
+  },
+  sportive:{
+    expression:'energetic, game-ready, athletic confidence',
+    bg:'stadium / sports court / running track / dynamic urban sports space',
+    mood:'team spirit, movement, performance energy, game-day vibes',
+    fabricNote:'',
+    styleNote:'athletic proportions, dynamic pose, sporty accessories',
+    colorPalette:[
+      'Electric Blue — Electric Blue (#0055FF) shell, White (#FFFFFF) accent',
+      'Hyper Pink — Hyper Pink (#FF007F) shell, Black (#000000) accent',
+      'Volt Strike — Signal Yellow (#FFDD00) shell, Jet Black (#111111) accent',
+      'Victory Green — Forest Green (#1B6B3A) shell, White (#FFFFFF) accent',
+      'Crimson Rush — Crimson Red (#DC143C) shell, Charcoal (#333333) accent'
+    ]
+  },
+  outdoor:{
+    expression:'calm explorer, adventure-ready, nature-connected',
+    bg:'misty mountain trail / scenic viewpoint / golden hour forest / gorpcore editorial',
+    mood:"adventure-ready, technical fashion, gorpcore aesthetic, Arc'teryx meets MLB",
+    fabricNote:'',
+    styleNote:'technical layering, trail shoes, outdoor functional accessories',
+    colorPalette:[
+      'Terracotta Earth — Terracotta (#C04000) shell, Moss Green (#4A5D23) accent',
+      'Slate & Teal — Slate Grey (#708090) shell, Teal Blue (#008080) accent',
+      'Military Olive — Olive Drab (#6B7754) shell, Dark Walnut (#5C3D2E) accent',
+      'Alpine Snow — Ice Blue (#C5DFF8) shell, Stone Grey (#8D8D8D) accent',
+      'Trail Pine — Pine Green (#2D6A4F) shell, Dune Sand (#C9A96E) accent'
+    ]
+  },
+  oldmoney:{
+    expression:"quietly poised, effortlessly refined, old-money ease — NOT athletic, NOT sporty",
+    bg:'Haussmann-style building exterior / European luxury hotel garden / Parisian cobblestone courtyard — NOT tennis court',
+    mood:"timeless heritage, Parisian luxury editorial, Ralph Lauren × MLB",
+    fabricNote:'ultra-fine micro-weave shell, soft natural luster, silk-adjacent surface quality, structured drape — NOT sporty nylon',
+    styleNote:'tonal head-to-toe coordination, minimal fine jewelry, small structured leather bag, clean cream leather sneakers',
+    colorPalette:[
+      'Camel & Ivory — Camel (#C19A6B) shell, Ivory (#FDF5E6) accent',
+      'Deep Navy & Burgundy — Deep Navy (#001F5B) shell, Burgundy (#800020) accent',
+      'Dove Grey — Dove Grey (#AFA9A0) shell, Champagne (#F7E7CE) accent',
+      'British Green — Bottle Green (#2E5B3C) shell, Tan (#C8A96E) accent',
+      'Blush Mauve — Muted Mauve (#B89BB0) shell, Cream White (#FAF6F0) accent'
+    ]
+  }
+};
+
+// ── colorPalette 순환 인덱스 (라이프스타일별 독립 카운터) ──
+const colorPaletteIdx={street:0,wellness:0,sportive:0,outdoor:0,oldmoney:0};
+
+// ── BUILD PROMPT (v5.1 simplified) ──
+function buildPrompt(f, colorOverride){
+  const d=DNA[f.theme];
+  const catName=CAT_L[f.cat]||f.cat;
+  const catFixed=CAT_FIXED[f.cat]||'';
+
+  // subject
+  const subject=gender==='men'
+    ?'A tall East Asian male model'
+    :'A tall East Asian female model';
+
+  // item description
+  const itemParts=[];
+  if(f.fit)itemParts.push(f.fit.toLowerCase()+' fit');
+  if(f.col)itemParts.push(f.col.toLowerCase());
+  if(f.len&&f.len!=='Regular')itemParts.push(f.len.toLowerCase()+' length');
+  if(catFixed)itemParts.push(catFixed);
+  const itemDesc=(itemParts.length?itemParts.join(', ')+' ':'')+catName;
+
+  // fabric
+  const fabParts=[];
+  if(f.fab)fabParts.push(f.fab);
+  if(f.den)fabParts.push(f.den+' denier');
+  if(f.str==='O (Stretch)')fabParts.push('4-way stretch');
+  if(f.lay&&f.lay!=='No Layer'&&f.lay!=='Single')fabParts.push(f.lay);
+  const fabStr=fabParts.join(', ');
+
+  // color: colorOverride → COLOR_SLOTS[0] → DNA palette cycling
+  let colorStr=colorOverride||'';
+  if(!colorStr){
+    const mainCol=getMainColorStr();
+    if(mainCol){colorStr=mainCol;}
+    else{
+      const _cp=d.colorPalette;
+      if(Array.isArray(_cp)&&_cp.length){
+        const _idx=colorPaletteIdx[f.theme]%_cp.length;
+        colorPaletteIdx[f.theme]=_idx+1;
+        colorStr=_cp[_idx];
+      }
+    }
+  }
+
+  // extras
+  const extras=[];
+  if(f.det)extras.push(f.det);
+
+  // logo spec
+  const logoSpec=buildLogoSpec(f);
+
+  let prompt='Full body fashion photo. '+subject+' wearing a luxury';
+  if(colorStr)prompt+=' '+colorStr;
+  prompt+=' '+itemDesc;
+  if(fabStr)prompt+=', in '+fabStr;
+  if(extras.length)prompt+='. '+extras.join(', ');
+  if(logoSpec){
+    if(BOTTOM_CATS.includes(f.cat)){
+      prompt+='. '+logoSpec+'. IMPORTANT: logo is on the thigh only — NO logo on chest, shoulder, or upper body.';
+    } else {
+      prompt+='. '+logoSpec+'.';
+    }
+  }
+  if(photoB64){
+    prompt+=' Same person, same face and hair.';
+    prompt+=' Keep bottom, shoes, and background EXACTLY as in the reference — only replace the '+catName+'.';
+  } else {
+    prompt+=' Slim, tall, natural body proportions. Small face, long legs.';
+  }
+  return prompt;
+}
+
+// ── GEMINI CALL (core) ──
+function getGeminiModel(){
+  return 'gemini-3.1-flash-image-preview';
+}
+async function callGemini(parts, key){
+  const model=getGeminiModel();
+  const res=await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
+    {method:'POST',headers:{'Content-Type':'application/json'},
+     body:JSON.stringify({
+       contents:[{parts}],
+       generationConfig:{
+         responseModalities:['IMAGE','TEXT'],
+         response_modalities:['IMAGE','TEXT'],
+         temperature:1,
+         candidateCount:1
+       }
+     })}
+  );
+  if(!res.ok){const ed=await res.json().catch(()=>({}));throw new Error(ed?.error?.message||`Gemini ${res.status}`)}
+  const data=await res.json();
+  const parts2=data?.candidates?.[0]?.content?.parts||[];
+  const imgPart=parts2.find(p=>p.inlineData||p.inline_data);
+  if(!imgPart){
+    const textPart=parts2.find(p=>p.text);
+    const reason=textPart?.text?`\n사유: ${textPart.text.slice(0,300)}`:'';
+    throw new Error(`Gemini 이미지 응답 없음 [모델: ${model}] — 텍스트만 반환됨${reason}`);
+  }
+  const id=imgPart.inlineData||imgPart.inline_data;
+  return {b64:id.data, mimeType:id.mimeType||id.mime_type||'image/png'};
+}
+
+// Text-only Gemini call (for design analysis step)
+async function callGeminiText(parts, key){
+  const model=getGeminiModel();
+  const res=await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
+    {method:'POST',headers:{'Content-Type':'application/json'},
+     body:JSON.stringify({contents:[{parts}]})}
+  );
+  if(!res.ok){const ed=await res.json().catch(()=>({}));throw new Error(ed?.error?.message||`Gemini text ${res.status}`)}
+  const data=await res.json();
+  return (data?.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('').trim();
+}
+
+// ── STEP 2: BUILD DESIGN PROMPT STRING ──
+function buildDesignPromptStr(prompt){
+  // buildPrompt already outputs final prompt; just return as-is
+  return prompt;
+}
+
+// ── STEP 2: GENERATE 4 DESIGN IMAGES (PARALLEL) ──
+async function genDesignImages(prompt, key, f){
+  // prompt param kept for compatibility; actual build happens per-call below
+  const parts=[];
+
+  designImages=[null,null,null,null];
+
+  // show grid, all cells to loading spinner
+  setDisplay('pe-design','none');
+  setDisplay('design-nokey','none');
+  setDisplay('design-err','none');
+  setDisplay('design-grid-wrap','flex');
+  [0,1,2,3].forEach(i=>setCellLoading('d-cell-'+i,'생성 중'));
+
+  document.getElementById('design-badge').textContent=`${photoB64?'📷 레퍼런스 · ':''}${THEME_L[f.theme]} · ${f.cat}`;
+  document.getElementById('design-title').textContent=`${THEME_L[f.theme]} ${CAT_L[f.cat]||f.cat} × 4`;
+
+  // 4 parallel calls — each builds own prompt; if no COLOR_SLOTS[0], cycles DNA palette for variety
+  const promises=[0,1,2,3].map(i=>{
+    const iPrompt=buildDesignPromptStr(buildPrompt(f));
+    const iParts=[];
+    if(photoB64)iParts.push({inline_data:{mime_type:photoType||'image/jpeg',data:photoB64}});
+    iParts.push({text:iPrompt});
+    return callGemini(iParts, key).then(({b64,mimeType})=>{
+      designImages[i]={b64,mimeType};
+      // legacy alias for first image
+      if(i===0){designImgB64=b64;designMimeType=mimeType;}
+      const src=`data:${mimeType};base64,${b64}`;
+      const cell=document.getElementById('d-cell-'+i);
+      cell.innerHTML=`<span class="cell-num">${i+1}</span>`;
+      const img=document.createElement('img');
+      img.src=src;img.alt='Design '+(i+1);
+      img.onclick=()=>openLightbox(src);
+      cell.appendChild(img);
+      const saveBtn=document.createElement('button');
+      saveBtn.className='d-cell-save';saveBtn.textContent='Save';
+      saveBtn.onclick=(e)=>{e.stopPropagation();dlDesignOne(i);};
+      cell.appendChild(saveBtn);
+    }).catch(e=>{
+      setCellError('d-cell-'+i, e.message||'오류');
+    })
+  });
+  await Promise.allSettled(promises);
+  // check at least one succeeded
+  if(designImages.every(d=>!d)) throw new Error('4개 디자인 생성 모두 실패');
+}
+
+// ── CAD PROMPT BUILDERS ──
+function buildCadAnalyzePrompt(f){
+  const catName=f?(CAT_L[f.cat]||f.cat):'garment';
+  const isBottom=f?BOTTOM_CATS.includes(f.cat):false;
+
+  if(isBottom){
+    return `You are an expert fashion technical designer. Analyze this garment image for 2D CAD reproduction.
+
+⚠️ CRITICAL: This garment is a ${catName} (BOTTOM / LOWER BODY). Analyze ONLY the bottom garment.
+Do NOT describe any jacket, shirt, hoodie, or upper body garment visible in the image.
+GARMENT TYPE (FIXED): ${catName} — Do not change this under any circumstances.
+
+Extract ONLY what is visually present on the ${catName}. Never assume or infer.
+
+════════════════════
+BOTTOM GARMENT SPEC
+════════════════════
+GARMENT TYPE: ${catName}
+
+WAIST:
+  Construction: [elastic waistband / drawstring / belt loops with waistband / banded / flat front]
+  Waistband height: [narrow ~3cm / medium ~4cm / wide ~6cm+]
+  Waistband color: [same as body or contrast]
+
+RISE: [low / mid / high rise — estimate based on where waist sits]
+
+SILHOUETTE / LEG SHAPE:
+  Overall fit: [slim / straight / wide / tapered / flared / balloon]
+  Hip area: [fitted / relaxed / very wide]
+  Thigh: [tight / relaxed / very wide]
+  Knee to hem: [tapers in / stays same / flares out]
+
+HEM:
+  Type: [straight cut / cuffed / elasticated / raw edge / ribbed band]
+  Hem color: [same as body or contrast]
+
+LEG OPENING: [narrow ~15cm / medium ~20cm / wide ~30cm+ estimate]
+
+INSEAM LENGTH: [short / cropped / regular / full length estimate]
+
+POCKETS:
+  Count and type: [e.g. "2 slash pockets at hip, 2 cargo patch pockets on thigh, 1 welt pocket back"]
+  Position: [describe exactly — hip / front slash / cargo thigh / back welt]
+  Closure: [open / zip / flap / snap / button / velcro]
+  Cargo pocket details: [if present — flap shape, strap, pleats, snap hardware]
+
+BELT LOOPS: [present / absent — count if visible, color, width]
+
+TOPSTITCHING: [visible stitch lines and exact position — seams, pocket edges, waistband, inseam, outseam]
+
+LOGO/GRAPHIC:
+  Position: [left thigh / waistband / back pocket / etc.]
+  Type: [embroidery / print / woven label]
+  Size: [small / medium]
+
+COLOR BLOCKING: [any seam lines that separate different fabric colors or panels — describe exact seam location]
+
+FABRIC SURFACE: [matte / satin-sheen / glossy / textured / denim weave — describe visual quality]
+
+SPECIAL DETAILS: [drawcord, reflective elements, zippers on leg, side stripes, any other notable features]`;
+  }
+
+  // ── TOP / OUTER garment analyze prompt ──
+  return `You are an expert fashion technical designer. Analyze this garment image with extreme precision for 2D CAD reproduction. Extract ONLY what is visually present — never assume or infer.
+
+GARMENT TYPE (FIXED): ${catName} — Do not change this.
+
+════════════════════════════════════════
+⚠️ PRIORITY FIELD — SLEEVE CONSTRUCTION
+════════════════════════════════════════
+SLEEVE TYPE: Identify ONE of the following based on where the shoulder seam sits:
+  - SET-IN: seam runs along the top of the shoulder at the shoulder point (most common — shoulder seam is a straight horizontal line)
+  - RAGLAN: diagonal seam runs from neckline down to underarm (no shoulder seam — sleeve goes all the way to collar)
+  - DROP-SHOULDER: seam falls off the shoulder onto the upper arm
+  - SADDLE: seam forms a T or saddle shape over the shoulder
+
+SLEEVE SEAM EVIDENCE: [describe exactly where the seam line is visible — e.g. "seam sits at shoulder point, horizontal line visible", "no shoulder seam, diagonal seam from collar to underarm"]
+
+COLOR PANEL SEAM: [if sleeve is a different color from body, describe exactly where the color change seam is — e.g. "color changes at shoulder seam", "color change panel runs diagonally from neckline"]
+
+════════════════════
+FULL SPEC LIST
+════════════════════
+GARMENT TYPE: [category name — bomber / windbreaker / hoodie / etc.]
+SILHOUETTE: [overall shape and fit — oversized / regular / slim; torso length relative to hip]
+
+COLLAR/NECK:
+  Type: [rib band / stand collar / band collar / spread / etc.]
+  Height: [low / mid / high]
+  Color: [same as body or contrast]
+
+FRONT CLOSURE:
+  Type: [center-front zip / button / snap / none]
+  Zipper details: [exposed or concealed, color of tape and pull hardware]
+
+SLEEVES:
+  Shape: [straight / tapered / slightly ballooned]
+  Cuff type: [rib band / elastic / button / straight cut]
+  Cuff color: [same as sleeve or contrast]
+  Any additional panels or seams on sleeve: [describe]
+
+HEM BAND:
+  Type: [rib band / straight cut / drawcord]
+  Color: [same as body or contrast]
+  Approximate width: [narrow ~3cm / medium ~5cm / wide ~8cm+]
+
+POCKETS:
+  Count and type: [e.g. "2 welt pockets at hip, no chest pocket"]
+  Position: [exact location — hip / chest / sleeve]
+  Closure: [open welt / zip / flap / snap]
+
+LOGO/GRAPHIC:
+  Position: [left chest / center chest / back / sleeve]
+  Type: [embroidery / print / woven patch]
+  Size: [small / medium / large]
+  Design: [describe the graphic — e.g. "NY logo white on dark background"]
+
+BODY PANELS: [any seam lines, yoke, panels on the body — describe each seam location]
+
+TOPSTITCHING: [visible stitch lines and their exact position on the garment]
+
+FABRIC SURFACE: [matte / satin-sheen / glossy / textured — describe the visual surface quality seen in the image]
+
+SPECIAL DETAILS: [lining visible at hem or cuffs, padding, reflective elements, mesh, any other notable features]`;
+}
+
+
+function buildCadGenPrompt(f, analysisText){
+  const count=cadCwCount;
+  const fallback=CAD_COLORWAYS[f.theme]||CAD_COLORWAYS.street;
+  const cad=f.cadColors||{};
+
+  const cw1raw=cad.col1||'';
+  const cw2=cad.col2||fallback[1];
+  const cw3=cad.col3||fallback[2];
+  const cw4=cad.col4||fallback[3];
+  const cw5=cad.col5||fallback[4];
+
+  const col1IsImage=!cw1raw;
+  const col1Label=col1IsImage?'replicate design image colors exactly':'user color: '+cw1raw;
+  const col1Body =col1IsImage?'same as attached reference image':(cw1raw.split('/')[0]?.trim()||'as in image');
+  const col1Accent=col1IsImage?'same as attached reference image':(cw1raw.includes('/')?cw1raw.split('/').slice(1).join('/').trim():'as in image');
+
+  const analysisBlock=analysisText||'[디자인 분석 결과 — Generate All 실행 시 자동 삽입]';
+
+  const layoutBlock=count===3
+    ?`⚠️ PANEL COUNT: EXACTLY 3 panels. Do NOT output more or fewer. Render ONLY Col1, Col2, Col3.
+- Layout: Col1 | Col2 | Col3  (left to right, single horizontal row)
+- Aspect ratio: approximately 3:1 (width:height)
+- The attached design image is for garment SHAPE reference ONLY — do NOT render it as a colorway panel in the output.`
+    :`⚠️ PANEL COUNT: EXACTLY 5 panels. Do NOT output more or fewer. Render ONLY Col1, Col2, Col3, Col4, Col5.
+- TOP ROW:    Col1 | Col2          (exactly 2 panels)
+- BOTTOM ROW: Col3 | Col4 | Col5   (exactly 3 panels)
+- Aspect ratio: approximately 3:2 (width:height)
+- The attached design image is for garment SHAPE reference ONLY — do NOT render it as a colorway panel in the output.`;
+
+  const cwList=count===3
+    ?`Col1 — ${col1Label}:
+  Body: ${col1Body}
+  Accent/trim: ${col1Accent}
+
+Col2 — ${cw2}:
+  Body: ${cw2.split('/')[0].trim()}
+  Accent/trim: ${cw2.split('/')[1]?.trim()||'contrasting'}
+
+Col3 — ${cw3}:
+  Body: ${cw3.split('/')[0].trim()}
+  Accent/trim: ${cw3.split('/')[1]?.trim()||'contrasting'}`
+    :`Col1 — ${col1Label}:
+  Body: ${col1Body}
+  Accent/trim: ${col1Accent}
+
+Col2 — ${cw2}:
+  Body: ${cw2.split('/')[0].trim()}
+  Accent/trim: ${cw2.split('/')[1]?.trim()||'contrasting'}
+
+Col3 — ${cw3}:
+  Body: ${cw3.split('/')[0].trim()}
+  Accent/trim: ${cw3.split('/')[1]?.trim()||'contrasting'}
+
+Col4 — ${cw4}:
+  Body: ${cw4.split('/')[0].trim()}
+  Accent/trim: ${cw4.split('/')[1]?.trim()||'contrasting'}
+
+Col5 — ${cw5}:
+  Body: ${cw5.split('/')[0].trim()}
+  Accent/trim: ${cw5.split('/')[1]?.trim()||'contrasting'}`;
+
+  const catName2=f?(CAT_L[f.cat]||f.cat):'garment';
+  const isBottom2=BOTTOM_CATS.includes(f.cat);
+  return `You are a professional fashion CAD illustrator. Draw a 2D flat sketch sheet with EXACTLY ${count===3?'THREE (3)':'FIVE (5)'} colorway panels of the EXACT same garment.
+
+⚠️ GARMENT TYPE (LOCKED): ${catName2} — You MUST draw a ${catName2}. ${isBottom2?'This is a BOTTOM garment (pants/skirt/shorts). Do NOT draw any jacket, shirt, hoodie, or upper body garment.':'Do NOT draw a jacket or garment different from the spec.'}
+
+${layoutBlock}
+
+═══ GARMENT SPECIFICATION ═══
+${analysisBlock}
+
+═══ DRAWING SPECS ═══
+- Each panel: IDENTICAL silhouette, IDENTICAL construction details — only colors change
+- Style: clean 2D technical flat sketch, front view, garment only (no body, no model)
+- Precise black outlines — all seams, topstitching, pocket shapes, collar, cuffs, hem exactly as specified
+- Solid flat color fills, no gradients, no shading, no shadows
+- NY logo mark in the exact placement noted in the spec
+- Small text label centered below each panel: ${count===3?'"Col1" / "Col2" / "Col3"':'"Col1" / "Col2" / "Col3" / "Col4" / "Col5"'}
+- Pure white background, no borders or frames
+
+═══ COLORWAYS ═══
+${cwList}
+
+⚠️ CRITICAL CONSTRUCTION RULES — DO NOT DEVIATE:
+1. SLEEVE TYPE: Draw EXACTLY the sleeve construction identified in the spec above.
+   - SET-IN: shoulder seam at shoulder point, clean horizontal line. NO raglan.
+   - RAGLAN: diagonal seam from collar to underarm. NO shoulder seam.
+   - DROP-SHOULDER: seam falls visibly off the shoulder.
+2. COLOR BLOCKING SEAM: seam position must follow spec exactly.
+3. All construction details (collar, hem, cuffs, pockets, closure) must match spec exactly.`;
+}
+
+function renderCadPrompts(f){
+  const c=THEME_C[f.theme];
+  const grad=`linear-gradient(135deg,${c} 0%,${c}cc 100%)`;
+  curCadAnalyzePrompt=buildCadAnalyzePrompt(f);
+  curCadGenPrompt=buildCadGenPrompt(f,'');
+  document.getElementById('pr-cad-analyze').textContent=curCadAnalyzePrompt;
+  document.getElementById('pr-cad-gen').textContent=curCadGenPrompt;
+  document.getElementById('pr-cad-gen-meta').textContent='3-A 분석 결과 + 컬러웨이 지시어 포함 프롬프트 (Generate All 실행 시 분석 결과 자동 삽입)';
+  document.getElementById('copy-cad-a-btn').style.background=grad;
+  document.getElementById('copy-cad-b-btn').style.background=grad;
+  setDisplay('pr-cad-section','flex');
+}
+
+function updateCadGenPromptDrawer(f, analysisText){
+  curCadGenPrompt=buildCadGenPrompt(f, analysisText);
+  document.getElementById('pr-cad-gen').textContent=curCadGenPrompt;
+  document.getElementById('pr-cad-gen-meta').textContent='✓ 분석 결과 반영 완료';
+}
+
+// ── STEP 3: GENERATE 2D CAD (2-step: analyze → generate) ──
+const CAD_COLORWAYS = {
+  street:   ['Black / Charcoal Grey',    'Navy / Off-White',       'Burgundy / Cream',       'Stone Grey / Black',     'Cobalt / White'],
+  wellness: ['Sage Green / Ivory',        'Dusty Lavender / White', 'Warm Beige / Sand',      'Pale Mint / Cream',      'Soft Blush / Off-White'],
+  sportive: ['Royal Blue / White',        'Signal Red / Black',     'Forest Green / Grey',    'Neon Yellow / Black',    'Teal / White'],
+  outdoor:  ['Olive / Khaki',             'Burnt Orange / Brown',   'Slate Grey / Teal',      'Earth Brown / Cream',    'Storm Blue / Stone'],
+  oldmoney: ['Ivory / Camel',             'Navy / Cream',           'Charcoal / Burgundy',    'Taupe / Gold',           'Forest / Ecru']
+};
+
+// ── STEP 3: GENERATE CAD FOR ONE DESIGN ──
+async function genCADForOne(idx, key, f){
+  const img=designImages[idx];
+  if(!img)return;
+  const cell=document.getElementById('c-cell-'+idx);
+  setCellLoading('c-cell-'+idx,'분석 중 (3-A)');
+
+  try{
+    // 3-A
+    const analysisText=await callGeminiText([
+      {inline_data:{mime_type:img.mimeType,data:img.b64}},
+      {text:buildCadAnalyzePrompt(f)}
+    ], key);
+
+    if(idx===0)updateCadGenPromptDrawer(f, analysisText);
+    setCellLoading('c-cell-'+idx,'CAD 생성 중 (3-B)');
+
+    // 3-B
+    const {b64,mimeType}=await callGemini([
+      {inline_data:{mime_type:img.mimeType,data:img.b64}},
+      {text:buildCadGenPrompt(f, analysisText)}
+    ], key);
+
+    const src=`data:${mimeType};base64,${b64}`;
+    cadImgSrcs[idx]=src;
+    if(idx===0)cadImgSrc=src;
+
+    cell.innerHTML=`<span class="cell-num">${idx+1}</span>`;
+    const cadImg=document.createElement('img');
+    cadImg.src=src;cadImg.alt='CAD '+(idx+1);
+    cadImg.onclick=()=>openLightbox(src);
+    cell.appendChild(cadImg);
+    const saveBtn=document.createElement('button');
+    saveBtn.className='d-cell-save';saveBtn.textContent='Save';
+    saveBtn.onclick=(e)=>{e.stopPropagation();dlCADOne(idx);};
+    cell.appendChild(saveBtn);
+  }catch(e){
+    setCellError('c-cell-'+idx, e.message||'CAD 오류');
+  }
+}
+
+// ── STEP 3: GENERATE ALL 4 CADs (PARALLEL) ──
+async function genAllCADImages(key, f){
+  cadImgSrcs=[null,null,null,null];
+  setDisplay('pe-cad','none');
+  setDisplay('cad-nodesign','none');
+  setDisplay('cad-err','none');
+  setDisplay('cad-grid-wrap','flex');
+  [0,1,2,3].forEach(i=>{
+    if(designImages[i]) setCellLoading('c-cell-'+i,'대기 중');
+    else setCellError('c-cell-'+i,'디자인 없음');
+  });
+  document.getElementById('cad-title').textContent=`${THEME_L[f.theme]} ${CAT_L[f.cat]||f.cat} — 4 × ${cadCwCount} Colorways`;
+
+  await Promise.allSettled([0,1,2,3].map(i=>genCADForOne(i, key, f)));
+
+  if(cadImgSrcs.every(c=>!c)) throw new Error('CAD 생성 모두 실패');
+}
+
+// ── SHOW/HIDE HELPERS ──
+function setDisplay(id,v){const el=document.getElementById(id);if(el)el.style.display=v}
+function hideAll2(){['pe-design','design-grid-wrap','design-nokey','design-err'].forEach(id=>setDisplay(id,'none'))}
+function hideAll3(){['pe-cad','cad-grid-wrap','cad-nodesign','cad-err'].forEach(id=>setDisplay(id,'none'))}
+function setCellLoading(cellId, msg){
+  const el=document.getElementById(cellId);if(!el)return;
+  el.innerHTML=`<div class="cell-loading"><div class="cell-spin"></div><div class="cell-status">${msg}</div></div>`;
+}
+function setCellError(cellId, msg){
+  const el=document.getElementById(cellId);if(!el)return;
+  el.innerHTML=`<div class="cell-err">${msg}</div>`;
+}
+
+// ── RENDER PROMPT ──
+function renderPrompt(f,text){
+  const c=THEME_C[f.theme];
+  document.getElementById('pr-eyebrow').textContent=THEME_L[f.theme]+' · '+f.cat;
+  document.getElementById('pr-eyebrow').style.color=c;
+  document.getElementById('pr-title').textContent=(CAT_L[f.cat]||f.cat)+' AI 이미지 생성';
+  document.getElementById('copy-btn').style.background=`linear-gradient(135deg,${c} 0%,${c}cc 100%)`;
+  document.getElementById('pr-meta').textContent=photoB64?'📷 레퍼런스 포함':'사진 없음';
+
+  const chips=document.getElementById('pr-chips');chips.innerHTML='';
+  [f.fit,f.col,f.lay,f.fn,f.fab,f.den,f.wt].filter(Boolean).forEach(a=>{
+    const s=document.createElement('span');s.className='chip key';s.textContent=a;chips.appendChild(s);
+  });
+  if(photoB64){const s=document.createElement('span');s.className='chip ref';s.textContent='📷 레퍼런스';chips.appendChild(s);}
+
+  const box=document.getElementById('pr-text');
+  box.textContent=text;box.style.borderColor=c;
+  setDisplay('pe-prompt','none');
+  setDisplay('pr-result','flex');
+
+  // Activate prompt button + auto-open drawer
+  document.getElementById('prompt-open-btn').classList.add('has-prompt');
+  openDrawer();
+}
+
+// ── MAIN FLOW ──
+async function runAll(){
+  const f=F();hideErr();
+  if(!f.fit&&!f.fab&&!f.col&&!f.fn&&!f.det){showErr('핏, 소재, 칼라, 기능 중 하나 이상 입력해주세요.');return}
+
+  const btn=document.getElementById('gen-btn');
+  btn.disabled=true;btn.textContent='Generating...';showProg();
+
+  // Reset state
+  designImages=[null,null,null,null];cadImgSrcs=[null,null,null,null];
+  designImgB64=null;cadImgSrc=null;
+  hideAll2();hideAll3();
+  setDisplay('pe-design','flex');
+  setDisplay('pe-cad','flex');
+
+  try{
+    // STEP 1: Prompt
+    prog(1,'active');
+    curPrompt=buildPrompt(f);
+    renderPrompt(f,curPrompt);
+    renderCadPrompts(f);
+    prog(1,'done');
+
+    const key=document.getElementById('gemini-key').value.trim();
+
+    if(!key){
+      hideAll2();setDisplay('design-nokey','flex');
+      hideAll3();setDisplay('cad-nodesign','flex');
+      prog(2,'');prog(3,'');
+    } else {
+      // STEP 2: 4 Design Images (parallel)
+      prog(2,'active');
+      hideAll2();
+      try{
+        await genDesignImages(curPrompt,key,f);
+        prog(2,'done');
+      }catch(e){
+        hideAll2();
+        const el=document.getElementById('design-err');
+        el.style.display='block';
+        el.innerHTML=`<strong style="font-size:13px;letter-spacing:.1em;text-transform:uppercase">Gemini 오류</strong><br>${e.message}<br><br>· API Key가 정확한지 확인 (AIza로 시작)<br>· <a href="https://aistudio.google.com/apikey" target="_blank">Google AI Studio</a>에서 키 발급`;
+        prog(2,'err');
+        hideAll3();setDisplay('cad-nodesign','flex');
+        prog(3,'');
+        return;
+      }
+
+      // STEP 3: 4 × CAD (parallel, each sequential 3-A→3-B)
+      prog(3,'active');
+      hideAll3();
+      try{
+        await genAllCADImages(key,f);
+        prog(3,'done');
+      }catch(e){
+        hideAll3();
+        const el=document.getElementById('cad-err');
+        el.style.display='block';
+        el.innerHTML=`<strong style="font-size:13px;letter-spacing:.1em;text-transform:uppercase">CAD 생성 오류</strong><br>${e.message}`;
+        prog(3,'err');
+      }
+    }
+  }catch(err){
+    showErr('오류: '+(err.message||'다시 시도해주세요.'));
+    [1,2,3].forEach(i=>prog(i,''));
+  } finally{
+    btn.disabled=false;btn.textContent='Generate All';
+  }
+}
+
+// ── UTILS ──
+let toastTimer=null;
+function showErr(m){
+  clearTimeout(toastTimer);
+  document.getElementById('toast-msg').textContent=m;
+  document.getElementById('toast').classList.add('show');
+  toastTimer=setTimeout(()=>hideErr(),5000);
+}
+function hideErr(){
+  clearTimeout(toastTimer);
+  document.getElementById('toast').classList.remove('show');
+}
+function copyPrompt(){
+  navigator.clipboard.writeText(curPrompt).then(()=>{
+    const btn=document.getElementById('copy-btn');
+    const prev=btn.textContent;
+    btn.textContent='Copied ✓';btn.style.opacity='.7';
+    setTimeout(()=>{btn.textContent=prev;btn.style.opacity='1';},1800);
+  });
+}
+function copyCadAnalyze(){
+  if(!curCadAnalyzePrompt)return;
+  navigator.clipboard.writeText(curCadAnalyzePrompt).then(()=>{
+    const btn=document.getElementById('copy-cad-a-btn');
+    const prev=btn.textContent;
+    btn.textContent='Copied ✓';btn.style.opacity='.7';
+    setTimeout(()=>{btn.textContent=prev;btn.style.opacity='1';},1800);
+  });
+}
+function copyCadGen(){
+  if(!curCadGenPrompt)return;
+  navigator.clipboard.writeText(curCadGenPrompt).then(()=>{
+    const btn=document.getElementById('copy-cad-b-btn');
+    const prev=btn.textContent;
+    btn.textContent='Copied ✓';btn.style.opacity='.7';
+    setTimeout(()=>{btn.textContent=prev;btn.style.opacity='1';},1800);
+  });
+}
+function dlDesignOne(i){
+  const img=designImages[i];if(!img)return;
+  const a=document.createElement('a');
+  a.href=`data:${img.mimeType};base64,${img.b64}`;
+  a.download=`MLB_${cat}_${theme}_${gender}_design${i+1}.png`;
+  a.click();
+}
+function dlCADOne(i){
+  const src=cadImgSrcs[i];if(!src)return;
+  const a=document.createElement('a');
+  a.href=src;
+  a.download=`MLB_${cat}_${theme}_2DCAD_${i+1}.png`;
+  a.click();
+}
+function dlAllDesigns(){
+  designImages.forEach((img,i)=>{if(img)setTimeout(()=>dlDesignOne(i),i*300);});
+}
+function dlAllCAD(){
+  cadImgSrcs.forEach((src,i)=>{if(src)setTimeout(()=>dlCADOne(i),i*300);});
+}
+
+// Gemini key persist
+const sk=localStorage.getItem('mlb-gkey');
+if(sk)document.getElementById('gemini-key').value=sk;
+document.getElementById('gemini-key').addEventListener('input',e=>localStorage.setItem('mlb-gkey',e.target.value));
+</script>
+</body>
+</html>

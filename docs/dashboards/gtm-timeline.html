@@ -1,0 +1,572 @@
+<title>MLB 27 GTM Timeline</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#F2F4F7; --panel:#FFFFFF; --panel-2:#F7F8FA; --line:#DCE1E8; --line-2:#EBEEF2;
+  --ink:#111B2E; --ink-2:#4A5568; --ink-3:#7C8797; --accent:#0B2D6B; --accent-ink:#FFFFFF;
+  --weekend:rgba(17,27,46,0.035); --today:#E11D48; --grid-month:#C5CCD6;
+  --c-tradeshow:#C2185B; --c-convention:#6A1B9A; --c-deadline:#D84315; --c-report:#1565C0;
+  --c-fabric:#00796B; --c-tag:#8D6E00; --c-feedback:#5C6BC0; --c-sample:#F9A825; --c-order:#2E7D32; --c-task:#78909C;
+  --chip-bg:rgba(255,255,255,.92); --shadow:0 8px 24px rgba(17,27,46,.12);
+  --fs:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --fm:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--fs);font-size:13px;line-height:1.4;-webkit-font-smoothing:antialiased}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0;padding:0}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+#app{display:flex;flex-direction:column;height:100vh;min-height:0}
+
+/* ---------- top bar ---------- */
+.top{display:flex;align-items:center;gap:20px;padding:10px 18px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.brand .eyebrow{font-family:var(--fm);font-size:10.5px;letter-spacing:.12em;color:var(--ink-3);text-transform:uppercase}
+.brand h1{margin:2px 0 0;font-size:17px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+.seg{display:inline-flex;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:2px}
+.seg button{padding:5px 12px;border-radius:6px;color:var(--ink-2);font-weight:500;white-space:nowrap}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.seg.season button{padding:6px 14px;font-weight:600}
+.ctrls{display:flex;align-items:center;gap:8px;margin-left:auto;flex-wrap:wrap}
+.search{display:flex;align-items:center;gap:6px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:0 10px;height:32px;min-width:220px}
+.search input{border:0;background:none;width:100%;outline:none}
+.search input::placeholder{color:var(--ink-3)}
+.btn{height:32px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel-2);font-weight:500;white-space:nowrap}
+.btn.today{border-color:var(--today);color:var(--today)}
+.btn:hover{border-color:var(--ink-3)}
+
+/* ---------- KPI strip ---------- */
+.kpis{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(190px,1fr);gap:8px;padding:10px 18px;overflow-x:auto;background:var(--bg);border-bottom:1px solid var(--line)}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px 12px;display:flex;flex-direction:column;gap:3px;border-left:4px solid var(--c);cursor:pointer;min-width:0}
+.kpi:hover{border-color:var(--ink-3);border-left-color:var(--c)}
+.kpi .d{font-family:var(--fm);font-size:11px;color:var(--ink-3);display:flex;justify-content:space-between;gap:8px}
+.kpi .d b{color:var(--c);font-weight:600}
+.kpi .t{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .s{font-size:11px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi.past{opacity:.55}
+
+/* ---------- body ---------- */
+.body{display:flex;flex:1;min-height:0}
+.side{width:236px;flex:none;background:var(--panel);border-right:1px solid var(--line);overflow-y:auto;display:flex;flex-direction:column}
+.side section{padding:12px 14px;border-bottom:1px solid var(--line-2)}
+.side h3{margin:0 0 8px;font-family:var(--fm);font-size:10.5px;letter-spacing:.12em;color:var(--ink-3);text-transform:uppercase;display:flex;justify-content:space-between;align-items:center}
+.side h3 button{font-family:var(--fs);font-size:11px;color:var(--accent);letter-spacing:0;text-transform:none;font-weight:500}
+.teams{display:flex;flex-direction:column;gap:2px}
+.team{display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;column-gap:8px;padding:6px 8px;border-radius:7px;text-align:left;width:100%;border:1px solid transparent}
+.team:hover{background:var(--panel-2)}
+.team[aria-pressed="true"]{background:var(--panel-2);border-color:var(--accent)}
+.team .n{font-weight:600}
+.team .c{font-family:var(--fm);font-size:11px;color:var(--ink-3);grid-row:1;grid-column:2}
+.team .nx{grid-column:1/3;font-size:11px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.team .nx b{font-family:var(--fm);font-weight:500;color:var(--ink-3);margin-right:4px}
+.team.dim{opacity:.4}
+.side .sub{font-size:11px;color:var(--ink-3);margin:6px 0 0}
+.funcs,.types{display:flex;flex-wrap:wrap;gap:5px}
+.pill{border:1px solid var(--line);border-radius:999px;padding:3px 9px;font-size:11.5px;color:var(--ink-2);background:var(--panel-2)}
+.pill[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.types .pill{display:inline-flex;align-items:center;gap:6px;background:none}
+.types .pill i{width:9px;height:9px;transform:rotate(45deg);background:var(--c);border-radius:1px;display:inline-block}
+.types .pill[aria-pressed="false"]{opacity:.4}
+.types .pill[aria-pressed="true"]{background:var(--panel-2);color:var(--ink);border-color:var(--line)}
+.opt{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-2);margin-top:6px}
+.opt input{accent-color:var(--accent)}
+
+/* ---------- timeline ---------- */
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.tl{flex:1;overflow:auto;position:relative;background:var(--panel)}
+.canvas{position:relative;min-width:100%}
+.grid{position:absolute;top:0;bottom:0;left:var(--lw);right:0;pointer-events:none;z-index:0}
+.grid .wk{position:absolute;top:0;bottom:0;background:var(--weekend)}
+.grid .mo{position:absolute;top:0;bottom:0;border-left:1px solid var(--grid-month)}
+.grid .ts{position:absolute;top:0;bottom:0;border-left:1px dashed var(--c-tradeshow);opacity:.6}
+.grid .now{position:absolute;top:0;bottom:0;border-left:2px solid var(--today);z-index:1}
+.head{position:sticky;top:0;z-index:5;display:flex;background:var(--panel);border-bottom:1px solid var(--line);height:52px}
+.corner{position:sticky;left:0;z-index:6;width:var(--lw);flex:none;background:var(--panel);border-right:1px solid var(--line);padding:8px 12px;font-family:var(--fm);font-size:11px;color:var(--ink-3);display:flex;flex-direction:column;justify-content:flex-end}
+.corner b{color:var(--ink);font-weight:500}
+.hcells{position:relative;flex:1;height:100%}
+.hm{position:absolute;top:0;height:26px;border-left:1px solid var(--grid-month);padding:5px 8px;font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden}
+.hm small{font-weight:400;color:var(--ink-3);margin-left:6px;font-family:var(--fm);font-size:10.5px}
+.hw{position:absolute;top:26px;height:26px;border-left:1px solid var(--line-2);font-family:var(--fm);font-size:10.5px;color:var(--ink-3);padding:6px 0 0 4px;white-space:nowrap;overflow:hidden}
+.hw.we{color:var(--c-deadline);opacity:.75}
+.hnow{position:absolute;top:0;height:100%;border-left:2px solid var(--today)}
+.hnow span{position:absolute;top:2px;left:4px;background:var(--today);color:#fff;font-family:var(--fm);font-size:10px;padding:1px 5px;border-radius:4px;white-space:nowrap}
+.hts{position:absolute;top:0;height:26px}
+.hts span{position:absolute;top:29px;left:-1px;transform:translateX(-50%);background:var(--c-tradeshow);color:#fff;font-size:10px;font-weight:600;padding:1px 6px;border-radius:4px;white-space:nowrap;line-height:1.5}
+
+.lanes{position:relative;z-index:1}
+.grp{display:flex;background:var(--panel-2);border-bottom:1px solid var(--line);border-top:1px solid var(--line);height:34px;position:sticky;top:52px;z-index:4}
+.grp .lab{position:sticky;left:0;z-index:2;width:var(--lw);flex:none;background:var(--panel-2);border-right:1px solid var(--line);display:flex;align-items:center;gap:8px;padding:0 10px;cursor:pointer;user-select:none}
+.grp .lab .tw{width:14px;color:var(--ink-3);font-size:10px;transition:transform .15s}
+.grp.closed .lab .tw{transform:rotate(-90deg)}
+.grp .lab .n{font-weight:700;font-size:12.5px}
+.grp .lab .sea{font-family:var(--fm);font-size:9.5px;letter-spacing:.06em;color:var(--ink-3);border:1px solid var(--line);border-radius:4px;padding:0 4px}
+.grp .lab .k{font-family:var(--fm);font-size:11px;color:var(--ink-3);margin-left:auto}
+.grp .ov{position:relative;flex:1}
+.grp .ov i{position:absolute;top:11px;width:3px;height:12px;border-radius:2px;background:var(--c);opacity:.8}
+.grp .ov i.key{top:8px;height:18px;width:4px}
+.lane{display:flex;border-bottom:1px solid var(--line-2);min-height:30px}
+.lane:last-child{border-bottom:0}
+.lane .lab{position:sticky;left:0;z-index:2;width:var(--lw);flex:none;background:var(--panel);border-right:1px solid var(--line);padding:6px 10px 6px 32px;font-size:12px;color:var(--ink-2);display:flex;align-items:flex-start;gap:6px}
+.lane .lab .k{font-family:var(--fm);font-size:10.5px;color:var(--ink-3);margin-left:auto}
+.lane .lab.team{color:var(--ink);font-weight:600}
+.lane .trk{position:relative;flex:1}
+.lane.hid{display:none}
+
+.ms{position:absolute;display:flex;align-items:center;gap:5px;height:22px;padding:0 6px 0 0;border-radius:5px;cursor:pointer;color:var(--c);max-width:250px;white-space:nowrap}
+.ms:hover{background:var(--chip-bg);box-shadow:0 0 0 1px var(--c);z-index:3}
+.ms i{width:9px;height:9px;flex:none;transform:rotate(45deg);background:var(--c);border-radius:1.5px;margin-left:2px;box-shadow:0 0 0 2px var(--panel)}
+.ms.b i{width:11px;height:11px}
+.ms span{overflow:hidden;text-overflow:ellipsis;font-size:11.5px;color:var(--ink);font-weight:500}
+.ms.b span{font-weight:700}
+.ms.nolab span{display:none}
+.ms.nolab{padding-right:2px}
+.ms.multi span::after{content:" ×" attr(data-n);color:var(--c);font-family:var(--fm);font-size:10px;font-weight:600}
+.bar{position:absolute;height:18px;top:2px;border-radius:4px;background:var(--c);opacity:.18}
+.bar+.ms span{max-width:220px}
+.ms.ranged{padding-left:2px}
+
+/* popup */
+.pop{position:fixed;z-index:50;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:10px 12px;max-width:330px;font-size:12px;pointer-events:none;display:none}
+.pop.on{display:block}
+.pop .pd{font-family:var(--fm);font-size:11px;color:var(--ink-3);display:flex;gap:10px;margin-bottom:4px}
+.pop .pd b{color:var(--today);font-weight:600}
+.pop .pt{font-weight:600;font-size:13px;color:var(--ink);white-space:pre-line;margin-bottom:6px}
+.pop .pm{color:var(--ink-2);display:flex;flex-wrap:wrap;gap:4px 10px}
+.pop .pm i{display:inline-block;width:8px;height:8px;transform:rotate(45deg);background:var(--c);border-radius:1px;margin-right:5px}
+.pop .teams{margin-top:6px;padding-top:6px;border-top:1px dashed var(--line);color:var(--ink-2);font-size:11.5px;line-height:1.5}
+
+/* list view */
+.list{flex:1;overflow:auto;background:var(--panel);padding:0 0 40px}
+.list table{border-collapse:collapse;width:100%;min-width:900px}
+.list th{position:sticky;top:0;background:var(--panel-2);text-align:left;font-family:var(--fm);font-size:10.5px;letter-spacing:.08em;color:var(--ink-3);font-weight:500;padding:9px 12px;border-bottom:1px solid var(--line);z-index:2}
+.list td{padding:7px 12px;border-bottom:1px solid var(--line-2);vertical-align:top}
+.list tr.mh td{background:var(--panel-2);font-weight:700;font-family:var(--fm);font-size:11.5px;color:var(--ink-2);padding:6px 12px;border-top:1px solid var(--line);position:sticky;top:33px;z-index:1}
+.list .dt{font-family:var(--fm);white-space:nowrap;color:var(--ink-2)}
+.list .dt.we{color:var(--c-deadline)}
+.list .dd{font-family:var(--fm);white-space:nowrap;color:var(--ink-3)}
+.list .dd.soon{color:var(--today);font-weight:600}
+.list .tm{font-weight:600;white-space:nowrap}
+.list .fn{color:var(--ink-2);white-space:nowrap}
+.list .ty{display:inline-flex;align-items:center;gap:6px;color:var(--c);font-size:11px;white-space:nowrap}
+.list .ty i{width:8px;height:8px;transform:rotate(45deg);background:var(--c);border-radius:1px}
+.list .tx{white-space:pre-line}
+.list .tx.b{font-weight:600}
+.list tr.past td{opacity:.6}
+.list tr.today td{background:color-mix(in srgb,var(--today) 8%,transparent)}
+.empty{padding:40px;text-align:center;color:var(--ink-3)}
+.foot{padding:6px 18px;border-top:1px solid var(--line);background:var(--panel);font-size:11px;color:var(--ink-3);display:flex;gap:16px;font-family:var(--fm)}
+.foot b{color:var(--ink-2);font-weight:500}
+[hidden]{display:none!important}
+@media (max-width:900px){.side{display:none}.top{gap:10px}}
+@media print{
+  #app{height:auto}.top .ctrls,.side,.kpis,.foot{display:none}
+  .tl{overflow:visible}.list{overflow:visible}.list th,.list tr.mh td{position:static}
+  body{background:#fff;color:#000}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div id="app">
+  <header class="top">
+    <div class="brand">
+      <div class="eyebrow">MLB · GTM Calendar 27 · 27F_team 기준</div>
+      <h1>27SS 2nd TS · 27FW Tradeshow 일정</h1>
+    </div>
+    <div class="seg season" id="seasonSeg">
+      <button data-v="all">전체</button>
+      <button data-v="ss2">27SS 2nd TS</button>
+      <button data-v="fw">27FW</button>
+    </div>
+    <div class="ctrls">
+      <div class="seg" id="viewSeg"><button data-v="tl">타임라인</button><button data-v="list">리스트</button></div>
+      <div class="seg" id="zoomSeg"><button data-v="month">월</button><button data-v="week">주</button><button data-v="day">일</button></div>
+      <button class="btn today" id="todayBtn">오늘</button>
+      <label class="search"><span style="color:var(--ink-3)">⌕</span><input id="q" type="search" placeholder="일정 검색 (예: PLM, 품평, TAG)"></label>
+      <button class="btn" id="printBtn">인쇄</button>
+    </div>
+  </header>
+  <section class="kpis" id="kpis"></section>
+  <div class="body">
+    <aside class="side">
+      <section>
+        <h3>팀 <button id="teamAll">전체 보기</button></h3>
+        <div class="teams" id="teamList"></div>
+      </section>
+      <section>
+        <h3>기능</h3>
+        <div class="funcs" id="funcList"></div>
+      </section>
+      <section>
+        <h3>일정 유형 <button id="typeAll">모두</button></h3>
+        <div class="types" id="typeList"></div>
+        <label class="opt"><input type="checkbox" id="optCommon" checked> 전 팀 공통 일정은 한 줄로 묶기</label>
+        <label class="opt"><input type="checkbox" id="optPast"> 지난 일정 흐리게</label>
+      </section>
+    </aside>
+    <div class="main">
+      <div class="tl" id="tl"></div>
+      <div class="list" id="list" hidden></div>
+      <div class="foot" id="foot"></div>
+    </div>
+  </div>
+  <div class="pop" id="pop"></div>
+</div>
+
+<script>
+const DATA = {"teams": [{"key": "ss2", "season": "27SS 2nd TS", "name": "27SS 2nd TS Apparel", "codes": "의류 전체", "master": "L"}, {"key": "ss2acc", "season": "27SS 2nd TS", "name": "27SS 2nd TS BAG / CAP", "codes": "BAG·CAP", "master": "BT"}, {"key": "k1", "season": "27FW", "name": "Knit 1", "codes": "TS·PQ·OP", "master": "R"}, {"key": "k2", "season": "27FW", "name": "Knit 2", "codes": "TR·PT·TO·LG·TK·SP", "master": "X"}, {"key": "k3", "season": "27FW", "name": "Knit 3", "codes": "MT·HD", "master": "AD"}, {"key": "sw", "season": "27FW", "name": "Sweater", "codes": "KC·KP", "master": "AJ"}, {"key": "dn", "season": "27FW", "name": "Denim", "codes": "DK·DR·DP·DS", "master": "AP"}, {"key": "w1", "season": "27FW", "name": "Woven 1", "codes": "DJ·DV·PD", "master": "AV"}, {"key": "w2", "season": "27FW", "name": "Woven 2", "codes": "JP·WS", "master": "BB"}, {"key": "w3", "season": "27FW", "name": "Woven 3", "codes": "WJ·FD", "master": "BH"}, {"key": "w4", "season": "27FW", "name": "Woven 4", "codes": "WP·SM·SK", "master": "BN"}, {"key": "bag", "season": "27FW", "name": "BAG", "codes": "BG", "master": "BU"}, {"key": "cap", "season": "27FW", "name": "HEADWEAR", "codes": "CP·BN·HT", "master": "BV"}, {"key": "sh", "season": "27FW", "name": "SHOES", "codes": "SH", "master": "BW"}, {"key": "misc", "season": "27FW", "name": "27FW Common / Note", "codes": "", "master": "BX"}], "items": [{"date": "2026-05-27", "team": "k1", "func": "Team", "text": "한/중-SKU PLAN 전달", "type": "task", "bold": true, "fill": null}, {"date": "2026-05-27", "team": "k2", "func": "Team", "text": "한/중-SKU PLAN 전달", "type": "task", "bold": true, "fill": null}, {"date": "2026-05-27", "team": "k3", "func": "Team", "text": "한/중-SKU PLAN 전달", "type": "task", "bold": true, "fill": null}, {"date": "2026-05-27", "team": "dn", "func": "Team", "text": "한/중-SKU PLAN 전달", "type": "task", "bold": true, "fill": null}, {"date": "2026-05-27", "team": "w1", "func": "Team", "text": "한/중-SKU PLAN 전달", "type": "task", "bold": true, "fill": null}, {"date": "2026-05-27", "team": "w3", "func": "Team", "text": "한/중-SKU PLAN 전달", "type": "task", "bold": true, "fill": null}, {"date": "2026-05-27", "team": "w4", "func": "Team", "text": "한/중-SKU PLAN 전달", "type": "task", "bold": true, "fill": null}, {"date": "2026-05-27", "team": "bag", "func": "Team", "text": "한/중-SKU PLAN 전달", "type": "task", "bold": true, "fill": null}, {"date": "2026-06-08", "team": "w4", "func": "Team", "text": "27FW CATEGORY STRATEGY REPORT(60-70%)\n+RANGE PLAN 초안+소재,칼라,그래픽 1차 전략 공유", "type": "report", "bold": true, "fill": "FFFFCCFF"}, {"date": "2026-06-08", "team": "cap", "func": "Team", "text": "27FW CATEGORY STRATEGY REPORT(60-70%)\n+RANGE PLAN 초안+소재,칼라,그래픽 1차 전략 공유", "type": "report", "bold": true, "fill": "FFFFCCFF"}, {"date": "2026-06-08", "team": "sh", "func": "Team", "text": "27FW CATEGORY STRATEGY REPORT(60-70%)\n+RANGE PLAN 초안+소재,칼라,그래픽 1차 전략 공유", "type": "report", "bold": true, "fill": "FFFFCCFF"}, {"date": "2026-06-11", "team": "k1", "func": "Team", "text": "27FW CATEGORY STRATEGY REPORT(60-70%)\n+RANGE PLAN 초안+소재,칼라,그래픽 1차 전략 공유", "type": "report", "bold": true, "fill": "FFFFCCFF"}, {"date": "2026-06-11", "team": "k2", "func": "Team", "text": "27FW CATEGORY STRATEGY REPORT(60-70%)\n+RANGE PLAN 초안+소재,칼라,그래픽 1차 전략 공유", "type": "report", "bold": true, "fill": "FFFFCCFF"}, {"date": "2026-06-11", "team": "sw", "func": "Team", "text": "27FW CATEGORY STRATEGY REPORT(60-70%)\n+RANGE PLAN 초안+소재,칼라,그래픽 1차 전략 공유(KC/KP)", "type": "report", "bold": true, "fill": "FFFFCCFF"}, {"date": "2026-06-11", "team": "dn", "func": "Team", "text": "27FW CATEGORY STRATEGY REPORT(60-70%)\n+RANGE PLAN 초안+소재,칼라,그래픽 1차 전략 공유(KC/KP)", "type": "report", "bold": true, "fill": "FFFFCCFF"}, {"date": "2026-06-17", "team": "k3", "func": "Team", "text": "27FW CATEGORY STRATEGY REPORT(60-70%)\n+RANGE PLAN 초안+소재,칼라,그래픽 1차 전략 공유", "type": "report", "bold": true, "fill": "FFFFCCFF"}, {"date": "2026-06-17", "team": "w3", "func": "Team", "text": "27FW CATEGORY STRATEGY REPORT(60-70%)\n+RANGE PLAN 초안+소재,칼라,그래픽 0차 전략 공유 (WJ.WS)", "type": "report", "bold": true, "fill": "FFFFCCFF"}, {"date": "2026-06-17", "team": "bag", "func": "Team", "text": "27FW CATEGORY STRATEGY REPORT(60-70%)\n+RANGE PLAN 초안+소재,칼라,그래픽 1차 전략 공유", "type": "report", "bold": true, "fill": "FFFFCCFF"}, {"date": "2026-06-18", "team": "cap", "func": "Team", "text": "1차 소재 수배", "type": "fabric", "bold": false, "fill": null}, {"date": "2026-06-18", "team": "sh", "func": "Team", "text": "1차 소재 수배", "type": "fabric", "bold": false, "fill": null}, {"date": "2026-06-25", "team": "dn", "func": "Team", "text": "27FW CATEGORY STRATEGY REPORT(60-70%)\n+RANGE PLAN 초안+소재,칼라,그래픽 1차 전략 공유(DENIM)", "type": "report", "bold": true, "fill": "FFFFCCFF"}, {"date": "2026-06-25", "team": "w3", "func": "Team", "text": "27FW CATEGORY STRATEGY REPORT(60-70%)\n+RANGE PLAN 초안+소재,칼라,그래픽 1차 전략 공유 (JP외)", "type": "report", "bold": true, "fill": "FFFFCCFF"}, {"date": "2026-06-26", "team": "cap", "func": "Team", "text": "RANGE PLAN 공유", "type": "task", "bold": true, "fill": null}, {"date": "2026-06-26", "team": "sh", "func": "Team", "text": "RANGE PLAN 공유", "type": "task", "bold": true, "fill": null}, {"date": "2026-07-02", "team": "w1", "func": "Team", "text": "27FW CATEGORY STRATEGY REPORT(60-70%)\n+RANGE PLAN 초안+소재,칼라,그래픽 1차 전략 공유", "type": "report", "bold": true, "fill": "FFFFCCFF"}, {"date": "2026-07-07", "team": "cap", "func": "Team", "text": "1차 소재 리뷰", "type": "fabric", "bold": true, "fill": null}, {"date": "2026-07-07", "team": "sh", "func": "Team", "text": "1차 소재 리뷰", "type": "fabric", "bold": true, "fill": null}, {"date": "2026-07-08", "team": "cap", "func": "Team", "text": "2차 소재 수배", "type": "fabric", "bold": false, "fill": null}, {"date": "2026-07-08", "team": "sh", "func": "Team", "text": "2차 소재 수배", "type": "fabric", "bold": false, "fill": null}, {"date": "2026-07-22", "team": "ss2", "func": "Team", "text": "2nd TS Ref Feedback - from CHN to KR", "type": "feedback", "bold": true, "fill": null}, {"date": "2026-07-22", "team": "ss2acc", "func": "Team", "text": "2nd TS Ref Feedback - from CHN to KR", "type": "feedback", "bold": true, "fill": null}, {"date": "2026-07-24", "team": "ss2", "func": "Team", "text": "2nd TS SKU C/F", "type": "task", "bold": true, "fill": null}, {"date": "2026-07-24", "team": "k1", "func": "Team", "text": "기획 선발주&1차 RANGE MAP 완료", "type": "task", "bold": false, "fill": null}, {"date": "2026-07-24", "team": "k2", "func": "Team", "text": "기획 선발주&1차 RANGE MAP 완료", "type": "task", "bold": false, "fill": null}, {"date": "2026-07-24", "team": "k3", "func": "Team", "text": "기획 선발주&1차 RANGE MAP 완료", "type": "task", "bold": false, "fill": null}, {"date": "2026-07-24", "team": "dn", "func": "Team", "text": "기획 선발주&1차 RANGE MAP 완료", "type": "task", "bold": false, "fill": null}, {"date": "2026-07-24", "team": "w1", "func": "Team", "text": "기획 선발주&1차 RANGE MAP 완료", "type": "task", "bold": false, "fill": null}, {"date": "2026-07-24", "team": "w3", "func": "Team", "text": "기획 선발주&1차 RANGE MAP 완료", "type": "task", "bold": false, "fill": null}, {"date": "2026-07-24", "team": "w4", "func": "Team", "text": "기획 선발주&1차 RANGE MAP 완료", "type": "task", "bold": false, "fill": null}, {"date": "2026-07-24", "team": "ss2acc", "func": "Team", "text": "2nd TS SKU C/F", "type": "task", "bold": true, "fill": null}, {"date": "2026-07-24", "team": "bag", "func": "Team", "text": "기획 선발주&1차 RANGE MAP 완료", "type": "task", "bold": false, "fill": null}, {"date": "2026-07-30", "team": "cap", "func": "Team", "text": "1차 목업 리뷰", "type": "fabric", "bold": false, "fill": null}, {"date": "2026-07-30", "team": "sh", "func": "Team", "text": "1차 목업 리뷰", "type": "fabric", "bold": false, "fill": null}, {"date": "2026-07-31", "team": "k1", "func": "Team", "text": "아이템/디자인별 소재매칭, 샘플원단 발주", "type": "fabric", "bold": true, "fill": null}, {"date": "2026-07-31", "team": "k2", "func": "Team", "text": "아이템/디자인별 소재매칭, 샘플원단 발주", "type": "fabric", "bold": true, "fill": null}, {"date": "2026-07-31", "team": "k3", "func": "Team", "text": "아이템/디자인별 소재매칭, 샘플원단 발주", "type": "fabric", "bold": true, "fill": null}, {"date": "2026-07-31", "team": "dn", "func": "Team", "text": "아이템/디자인별 소재매칭, 샘플원단 발주", "type": "fabric", "bold": true, "fill": null}, {"date": "2026-07-31", "team": "w1", "func": "Team", "text": "아이템/디자인별 소재매칭, 샘플원단 발주", "type": "fabric", "bold": true, "fill": null}, {"date": "2026-07-31", "team": "w3", "func": "Team", "text": "아이템/디자인별 소재매칭, 샘플원단 발주", "type": "fabric", "bold": true, "fill": null}, {"date": "2026-07-31", "team": "w4", "func": "Team", "text": "아이템/디자인별 소재매칭, 샘플원단 발주", "type": "fabric", "bold": true, "fill": null}, {"date": "2026-07-31", "team": "bag", "func": "Team", "text": "아이템/디자인별 소재매칭, 샘플원단 발주", "type": "fabric", "bold": true, "fill": null}, {"date": "2026-08-03", "team": "ss2", "func": "Team", "text": "Fabric & Color C/F", "type": "fabric", "bold": true, "fill": null}, {"date": "2026-08-03", "team": "ss2acc", "func": "Team", "text": "Fabric & Color C/F", "type": "fabric", "bold": true, "fill": null}, {"date": "2026-08-05", "team": "ss2", "func": "Team", "text": "Fabric input deadline", "type": "deadline", "bold": true, "fill": null}, {"date": "2026-08-05", "team": "ss2acc", "func": "Team", "text": "Fabric input deadline", "type": "deadline", "bold": true, "fill": null}, {"date": "2026-08-06", "team": "bag", "func": "Team", "text": "가격대 / 진행 캐드 확인", "type": "task", "bold": false, "fill": null}, {"date": "2026-08-12", "team": "ss2", "func": "Team", "text": "Color &Fabric &Graphic CEO C/F", "type": "convention", "bold": true, "fill": "FFFFC000"}, {"date": "2026-08-12", "team": "ss2acc", "func": "Team", "text": "Color &Fabric &Graphic CEO C/F", "type": "convention", "bold": true, "fill": "FFFFC000"}, {"date": "2026-08-14", "team": "bag", "func": "Team", "text": "목업 우선 수입 투입", "type": "fabric", "bold": false, "fill": null}, {"date": "2026-08-19", "team": "w1", "func": "Team", "text": "27FW STRATEGY REPORT", "type": "report", "bold": true, "fill": "FFCC66FF"}, {"date": "2026-08-19", "team": "w1", "func": "MD", "text": "RANGE PLAN & Strategy Report", "type": "report", "bold": true, "fill": "FFD8BEEC"}, {"date": "2026-08-19", "team": "w1", "func": "Design", "text": "Design CAD/ Fabric / Color Report", "type": "report", "bold": true, "fill": "FFD8BEEC"}, {"date": "2026-08-19", "team": "w2", "func": "Team", "text": "27FW STRATEGY REPORT", "type": "report", "bold": true, "fill": "FFCC66FF"}, {"date": "2026-08-19", "team": "w2", "func": "MD", "text": "RANGE PLAN & Strategy Report", "type": "report", "bold": true, "fill": "FFD8BEEC"}, {"date": "2026-08-19", "team": "w2", "func": "Design", "text": "Design CAD/ Fabric / Color Report", "type": "report", "bold": true, "fill": "FFD8BEEC"}, {"date": "2026-08-19", "team": "bag", "func": "Team", "text": "27FW STRATEGY REPORT", "type": "report", "bold": true, "fill": "FFCC66FF"}, {"date": "2026-08-21", "team": "ss2", "func": "Team", "text": "DS - Sample PLM Deadline", "type": "deadline", "bold": true, "fill": "FFC00000"}, {"date": "2026-08-21", "team": "ss2", "func": "Design", "text": "Sample PLM Deadline", "type": "deadline", "bold": true, "fill": "FFC00000"}, {"date": "2026-08-21", "team": "ss2acc", "func": "Team", "text": "DS - Sample PLM Deadline", "type": "deadline", "bold": true, "fill": "FFC00000"}, {"date": "2026-08-21", "team": "cap", "func": "Team", "text": "2차 목업 리뷰", "type": "fabric", "bold": false, "fill": null}, {"date": "2026-08-25", "team": "ss2", "func": "Team", "text": "MD- Launching map C/F Global sharing\n런칭맵 글로벌 공유", "type": "tag", "bold": true, "fill": null}, {"date": "2026-08-25", "team": "ss2", "func": "MD", "text": "Launching Map 배포", "type": "tag", "bold": false, "fill": null}, {"date": "2026-08-25", "team": "ss2acc", "func": "Team", "text": "MD- Launching map C/F Global sharing\n런칭맵 글로벌 공유", "type": "tag", "bold": true, "fill": null}, {"date": "2026-08-26", "team": "sw", "func": "Team", "text": "27FW STRATEGY REPORT", "type": "report", "bold": true, "fill": "FFCC66FF"}, {"date": "2026-08-26", "team": "sw", "func": "MD", "text": "RANGE PLAN & Strategy Report", "type": "report", "bold": true, "fill": "FFD8BEEC"}, {"date": "2026-08-26", "team": "sw", "func": "Design", "text": "Design CAD/ Fabric / Color Report", "type": "report", "bold": true, "fill": "FFD8BEEC"}, {"date": "2026-08-26", "team": "dn", "func": "Team", "text": "27FW STRATEGY REPORT", "type": "report", "bold": true, "fill": "FFCC66FF"}, {"date": "2026-08-26", "team": "dn", "func": "MD", "text": "RANGE PLAN & Strategy Report", "type": "report", "bold": true, "fill": "FFD8BEEC"}, {"date": "2026-08-26", "team": "dn", "func": "Design", "text": "Design CAD/ Fabric / Color Report", "type": "report", "bold": true, "fill": "FFD8BEEC"}, {"date": "2026-08-26", "team": "w3", "func": "Team", "text": "27FW STRATEGY REPORT", "type": "report", "bold": true, "fill": "FFCC66FF"}, {"date": "2026-08-26", "team": "w3", "func": "MD", "text": "RANGE PLAN & Strategy Report", "type": "report", "bold": true, "fill": "FFD8BEEC"}, {"date": "2026-08-26", "team": "w3", "func": "Design", "text": "Design CAD/ Fabric / Color Report", "type": "report", "bold": true, "fill": "FFD8BEEC"}, {"date": "2026-08-26", "team": "w4", "func": "Team", "text": "27FW STRATEGY REPORT", "type": "report", "bold": true, "fill": "FFCC66FF"}, {"date": "2026-08-26", "team": "w4", "func": "MD", "text": "RANGE PLAN & Strategy Report", "type": "report", "bold": true, "fill": "FFD8BEEC"}, {"date": "2026-08-26", "team": "w4", "func": "Design", "text": "Design CAD/ Fabric / Color Report", "type": "report", "bold": true, "fill": "FFD8BEEC"}, {"date": "2026-08-26", "team": "bag", "func": "Team", "text": "27FW CAD 재보고", "type": "report", "bold": true, "fill": "FFCC66FF"}, {"date": "2026-08-26", "team": "cap", "func": "Team", "text": "27FW STRATEGY REPORT", "type": "report", "bold": true, "fill": "FFCC66FF"}, {"date": "2026-08-27", "team": "bag", "func": "Team", "text": "목업리뷰 필요한 스타일 우선 목업투입", "type": "fabric", "bold": false, "fill": null}, {"date": "2026-08-28", "team": "ss2", "func": "Team", "text": "CHN - Feedback (Launch date)\n중국 런칭맵 피드백 주기", "type": "tag", "bold": true, "fill": null}, {"date": "2026-08-28", "team": "ss2", "func": "Chn/SEA", "text": "Feedback on the Launch date", "type": "tag", "bold": true, "fill": null}, {"date": "2026-08-28", "team": "ss2", "func": "Cate Oper/MKT", "text": "Feedback on the Launch date", "type": "tag", "bold": true, "fill": null}, {"date": "2026-08-28", "team": "w1", "func": "Team", "text": "(선진행) 전컬러 소재 투입 완료", "type": "fabric", "bold": true, "fill": null}, {"date": "2026-08-28", "team": "w2", "func": "Team", "text": "PLM 마감/1차품평 소재입고 완료 (재고 O)", "type": "convention", "bold": true, "fill": "FF92D050"}, {"date": "2026-08-28", "team": "ss2acc", "func": "Team", "text": "CHN - Feedback (Launch date)\n중국 런칭맵 피드백 주기", "type": "tag", "bold": true, "fill": null}, {"date": "2026-08-28", "team": "bag", "func": "Team", "text": "CAD 재보고 후 최종디테일 소싱팀에 전달", "type": "report", "bold": false, "fill": null}, {"date": "2026-09-01", "team": "ss2", "func": "Team", "text": "MD - TAG Check Start\n2nd TS Tag 시작", "type": "tag", "bold": true, "fill": null}, {"date": "2026-09-01", "team": "ss2", "func": "MD", "text": "Tag Check Start", "type": "tag", "bold": true, "fill": null}, {"date": "2026-09-01", "team": "ss2acc", "func": "Team", "text": "MD - TAG Check Start\n2nd TS Tag 시작", "type": "tag", "bold": true, "fill": null}, {"date": "2026-09-02", "team": "ss2", "func": "Team", "text": "SC - Feedback on Inbound date ( 1st )\n런칭일에 따른 입고일 피드백주기", "type": "tag", "bold": true, "fill": null}, {"date": "2026-09-02", "team": "ss2", "func": "Sourcing", "text": "2nd TS 입고일자 피드백", "type": "feedback", "bold": true, "fill": null}, {"date": "2026-09-02", "team": "k1", "func": "Team", "text": "27FW STRATEGY REPORT", "type": "report", "bold": true, "fill": "FFCC66FF"}, {"date": "2026-09-02", "team": "k1", "func": "MD", "text": "RANGE PLAN & Strategy Report", "type": "report", "bold": true, "fill": "FFD8BEEC"}, {"date": "2026-09-02", "team": "k1", "func": "Design", "text": "Design CAD/ Fabric / Color Report", "type": "report", "bold": true, "fill": "FFD8BEEC"}, {"date": "2026-09-02", "team": "k2", "func": "Team", "text": "27FW STRATEGY REPORT", "type": "report", "bold": true, "fill": "FFCC66FF"}, {"date": "2026-09-02", "team": "k2", "func": "MD", "text": "RANGE PLAN & Strategy Report", "type": "report", "bold": true, "fill": "FFD8BEEC"}, {"date": "2026-09-02", "team": "k2", "func": "Design", "text": "Design CAD/ Fabric / Color Report", "type": "report", "bold": true, "fill": "FFD8BEEC"}, {"date": "2026-09-02", "team": "k3", "func": "Team", "text": "27FW STRATEGY REPORT", "type": "report", "bold": true, "fill": "FFCC66FF"}, {"date": "2026-09-02", "team": "k3", "func": "MD", "text": "RANGE PLAN & Strategy Report", "type": "report", "bold": true, "fill": "FFD8BEEC"}, {"date": "2026-09-02", "team": "k3", "func": "Design", "text": "Design CAD/ Fabric / Color Report", "type": "report", "bold": true, "fill": "FFD8BEEC"}, {"date": "2026-09-02", "team": "ss2acc", "func": "Team", "text": "SC - Feedback on Inbound date ( 1st )\n런칭일에 따른 입고일 피드백주기", "type": "tag", "bold": true, "fill": null}, {"date": "2026-09-02", "team": "bag", "func": "Team", "text": "PLM 마감", "type": "deadline", "bold": true, "fill": "FF92D050"}, {"date": "2026-09-02", "team": "cap", "func": "Team", "text": "PLM 마감", "type": "deadline", "bold": true, "fill": "FF92D050"}, {"date": "2026-09-02", "team": "sh", "func": "Team", "text": "27FW STRATEGY REPORT", "type": "report", "bold": true, "fill": "FFCC66FF"}, {"date": "2026-09-04", "team": "ss2", "func": "Team", "text": "FB / SC - Sample FB Inbound Dealine", "type": "deadline", "bold": true, "fill": null}, {"date": "2026-09-04", "team": "ss2", "func": "Design", "text": "샘플 소재 입고 Deadline", "type": "deadline", "bold": true, "fill": "FFFF0000"}, {"date": "2026-09-04", "team": "ss2", "func": "Sourcing", "text": "샘플 소재 입고 Deadline", "type": "deadline", "bold": true, "fill": "FFFF0000"}, {"date": "2026-09-04", "team": "sw", "func": "Team", "text": "PLM 마감 / 1차품평소재입고 스웨터 완료 (재고 O)", "type": "convention", "bold": true, "fill": "FF92D050"}, {"date": "2026-09-04", "team": "dn", "func": "Team", "text": "PLM 마감  1차품평소재입고 데님완료(재고 O)", "type": "convention", "bold": true, "fill": "FF92D050"}, {"date": "2026-09-04", "team": "w1", "func": "Team", "text": "(선진행+1차) PLM 마감 / 1차 소재입고 완료(재고O)", "type": "deadline", "bold": true, "fill": null}, {"date": "2026-09-04", "team": "w2", "func": "Team", "text": "2차품평 전컬러 소재 투입완료", "type": "convention", "bold": true, "fill": null}, {"date": "2026-09-04", "team": "w3", "func": "Team", "text": "PLM 마감/1차품평 소재입고 완료 (재고 O)", "type": "convention", "bold": true, "fill": "FF92D050"}, {"date": "2026-09-04", "team": "w4", "func": "Team", "text": "PLM 마감/1차품평 소재입고 완료 (재고 O)", "type": "convention", "bold": true, "fill": "FF92D050"}, {"date": "2026-09-04", "team": "ss2acc", "func": "Team", "text": "FB / SC - Sample FB Inbound Dealine", "type": "deadline", "bold": true, "fill": null}, {"date": "2026-09-07", "team": "ss2", "func": "Team", "text": "MD/DS/SC - Sample Spec Meeting", "type": "sample", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-09-07", "team": "ss2", "func": "MD", "text": "Sample Spec Meeting", "type": "sample", "bold": false, "fill": "FFFFFF00"}, {"date": "2026-09-07", "team": "ss2", "func": "Design", "text": "Sample Spec Meeting", "type": "sample", "bold": false, "fill": "FFFFFF00"}, {"date": "2026-09-07", "team": "ss2", "func": "Sourcing", "text": "Sample Spec Meeting", "type": "sample", "bold": false, "fill": "FFFFFF00"}, {"date": "2026-09-07", "team": "ss2acc", "func": "Team", "text": "MD/DS/SC - Sample Spec Meeting", "type": "sample", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-09-08", "team": "ss2", "func": "Team", "text": "MD/DS/SC - Sample Spec Meeting", "type": "sample", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-09-08", "team": "ss2", "func": "MD", "text": "Sample Spec Meeting", "type": "sample", "bold": false, "fill": "FFFFFF00"}, {"date": "2026-09-08", "team": "ss2", "func": "Design", "text": "Sample Spec Meeting", "type": "sample", "bold": false, "fill": "FFFFFF00"}, {"date": "2026-09-08", "team": "ss2", "func": "Sourcing", "text": "Sample Spec Meeting", "type": "sample", "bold": false, "fill": "FFFFFF00"}, {"date": "2026-09-08", "team": "ss2acc", "func": "Team", "text": "MD/DS/SC - Sample Spec Meeting", "type": "sample", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-09-09", "team": "ss2", "func": "Team", "text": "MD - Tag check 1st Fix & Share\nTag Check 확정짓고 글로벌 공유", "type": "tag", "bold": true, "fill": null}, {"date": "2026-09-09", "team": "ss2", "func": "MD", "text": "Tag Check FIX 및 공유하기", "type": "tag", "bold": false, "fill": null}, {"date": "2026-09-09", "team": "ss2acc", "func": "Team", "text": "MD - Tag check 1st Fix & Share\nTag Check 확정짓고 글로벌 공유", "type": "tag", "bold": true, "fill": null}, {"date": "2026-09-09", "team": "bag", "func": "Team", "text": "지그", "type": "task", "bold": true, "fill": null}, {"date": "2026-09-10", "team": "ss2", "func": "MD", "text": "Tag check 공유 deadline", "type": "deadline", "bold": false, "fill": null}, {"date": "2026-09-11", "team": "ss2", "func": "Team", "text": "FB / SC - Sample FB Inbound Dealine 2nd", "type": "deadline", "bold": true, "fill": null}, {"date": "2026-09-11", "team": "ss2", "func": "Design", "text": "샘플 소재 입고 Deadline", "type": "deadline", "bold": true, "fill": "FFFF0000"}, {"date": "2026-09-11", "team": "ss2", "func": "Sourcing", "text": "샘플 소재 입고 Deadline", "type": "deadline", "bold": true, "fill": "FFFF0000"}, {"date": "2026-09-11", "team": "k1", "func": "Team", "text": "PLM 마감 / 1차품평 소재입고 완료 (재고 O)", "type": "convention", "bold": true, "fill": "FF92D050"}, {"date": "2026-09-11", "team": "k2", "func": "Team", "text": "PLM 마감 / 7차품평 소재입고 완료 (재고 O)", "type": "convention", "bold": true, "fill": "FF92D050"}, {"date": "2026-09-11", "team": "k3", "func": "Team", "text": "PLM 마감 / 13차품평 소재입고 완료 (재고 O)", "type": "convention", "bold": true, "fill": "FF92D050"}, {"date": "2026-09-11", "team": "dn", "func": "Team", "text": "2차품평 전컬러 소재 투입완료", "type": "convention", "bold": true, "fill": null}, {"date": "2026-09-11", "team": "w1", "func": "Team", "text": "2차품평 전컬러 소재 투입완료", "type": "convention", "bold": true, "fill": null}, {"date": "2026-09-11", "team": "w3", "func": "Team", "text": "2차품평 전컬러 소재 투입완료", "type": "convention", "bold": true, "fill": null}, {"date": "2026-09-11", "team": "w4", "func": "Team", "text": "2차품평 전컬러 소재 투입완료", "type": "convention", "bold": true, "fill": null}, {"date": "2026-09-11", "team": "ss2acc", "func": "Team", "text": "FB / SC - Sample FB Inbound Dealine 2nd", "type": "deadline", "bold": true, "fill": null}, {"date": "2026-09-14", "team": "ss2", "func": "Team", "text": "Chn - Feedback on th TAG (Price)\n중국 TAG 피드백 받기", "type": "tag", "bold": true, "fill": null}, {"date": "2026-09-14", "team": "ss2", "func": "Chn/SEA", "text": "Feedback on the TAG(Price)", "type": "tag", "bold": false, "fill": null}, {"date": "2026-09-14", "team": "ss2", "func": "Cate Oper/MKT", "text": "Feedback on the TAG(Price)", "type": "tag", "bold": false, "fill": null}, {"date": "2026-09-14", "team": "ss2acc", "func": "Team", "text": "Chn - Feedback on th TAG (Price)\n중국 TAG 피드백 받기", "type": "tag", "bold": true, "fill": null}, {"date": "2026-09-15", "team": "ss2", "func": "MD", "text": "TAG & 런칭일 조율", "type": "tag", "bold": false, "fill": null}, {"date": "2026-09-16", "team": "ss2", "func": "MD", "text": "TAG & 런칭일 조율", "type": "tag", "bold": false, "fill": null}, {"date": "2026-09-16", "team": "bag", "func": "Team", "text": "가방 2차 라인업 추가 보고", "type": "report", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-09-17", "team": "ss2", "func": "MD", "text": "TAG & 런칭일 조율", "type": "tag", "bold": false, "fill": null}, {"date": "2026-09-18", "team": "ss2", "func": "Team", "text": "MD - Tag& Launch date Fix (Final)\n최종 런칭/TAG가 확정", "type": "tag", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-09-18", "team": "ss2", "func": "MD", "text": "Tag& Launch date C/F", "type": "tag", "bold": true, "fill": null}, {"date": "2026-09-18", "team": "ss2", "func": "Chn/SEA", "text": "Tag& Launch date C/F", "type": "tag", "bold": true, "fill": null}, {"date": "2026-09-18", "team": "ss2", "func": "Cate Oper/MKT", "text": "Tag& Launch date C/F", "type": "tag", "bold": true, "fill": null}, {"date": "2026-09-18", "team": "k1", "func": "Team", "text": "2차품평 전컬러 소재 투입완료", "type": "convention", "bold": true, "fill": null}, {"date": "2026-09-18", "team": "k2", "func": "Team", "text": "2차품평 전컬러 소재 투입완료", "type": "convention", "bold": true, "fill": null}, {"date": "2026-09-18", "team": "k3", "func": "Team", "text": "2차품평 전컬러 소재 투입완료", "type": "convention", "bold": true, "fill": null}, {"date": "2026-09-18", "team": "sw", "func": "Team", "text": "2차품평 전컬러 소재 투입완료", "type": "convention", "bold": true, "fill": null}, {"date": "2026-09-18", "team": "ss2acc", "func": "Team", "text": "MD - Tag& Launch date Fix (Final)\n최종 런칭/TAG가 확정", "type": "tag", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-09-21", "team": "w1", "func": "Team", "text": "(선발주) 소재 입고 시작", "type": "fabric", "bold": true, "fill": "FF00B0F0"}, {"date": "2026-09-23", "team": "bag", "func": "Team", "text": "사양, T&A, MCQ 회의 및 RAW 업데이트", "type": "task", "bold": false, "fill": null}, {"date": "2026-09-28", "team": "w1", "func": "Team", "text": "(선발주) 소재 입고 완료", "type": "fabric", "bold": true, "fill": "FF00B0F0"}, {"date": "2026-09-30", "team": "cap", "func": "Team", "text": "샘플 입고 완료", "type": "sample", "bold": true, "fill": null}, {"date": "2026-09-30", "team": "misc", "func": "Team", "text": "중국 1차 수주용 라벨링 마감 (1차품평샘플+라벨링 이미지)", "type": "convention", "bold": true, "fill": null}, {"date": "2026-10-02", "team": "bag", "func": "Team", "text": "샘플 입고 완료", "type": "sample", "bold": true, "fill": null}, {"date": "2026-10-08", "team": "ss2", "func": "Team", "text": "Sample inbound Deadline (CHN &KR)\n샘플도착 기한", "type": "deadline", "bold": true, "fill": "FFFF6565"}, {"date": "2026-10-08", "team": "ss2", "func": "Design", "text": "상품설명서 deadline", "type": "deadline", "bold": false, "fill": null}, {"date": "2026-10-08", "team": "ss2", "func": "Cate Oper/MKT", "text": "샘플 전달", "type": "sample", "bold": false, "fill": null}, {"date": "2026-10-08", "team": "ss2acc", "func": "Team", "text": "Sample inbound Deadline (CHN &KR)\n샘플도착 기한", "type": "deadline", "bold": true, "fill": "FFFF6565"}, {"date": "2026-10-08", "team": "bag", "func": "Team", "text": "Sample inbound Deadline (CHN &KR)\n샘플도착 기한", "type": "deadline", "bold": true, "fill": "FFFF6565"}, {"date": "2026-10-08", "team": "cap", "func": "Team", "text": "Sample inbound Deadline (CHN &KR)\n샘플도착 기한", "type": "deadline", "bold": true, "fill": "FFFF6565"}, {"date": "2026-10-08", "team": "sh", "func": "Team", "text": "Sample inbound Deadline (CHN &KR)\n샘플도착 기한", "type": "deadline", "bold": true, "fill": "FFFF6565"}, {"date": "2026-10-12", "team": "ss2", "func": "Team", "text": "2nd TS CEO Convention", "type": "convention", "bold": true, "fill": "FFFF99FF"}, {"date": "2026-10-12", "team": "k1", "func": "Team", "text": "Sample inbound Deadline", "type": "deadline", "bold": true, "fill": "FFFF6565"}, {"date": "2026-10-12", "team": "k2", "func": "Team", "text": "Sample inbound Deadline", "type": "deadline", "bold": true, "fill": "FFFF6565"}, {"date": "2026-10-12", "team": "k3", "func": "Team", "text": "Sample inbound Deadline", "type": "deadline", "bold": true, "fill": "FFFF6565"}, {"date": "2026-10-12", "team": "sw", "func": "Team", "text": "Sample inbound Deadline", "type": "deadline", "bold": true, "fill": "FFFF6565"}, {"date": "2026-10-12", "team": "dn", "func": "Team", "text": "Sample inbound Deadline", "type": "deadline", "bold": true, "fill": "FFFF6565"}, {"date": "2026-10-12", "team": "w1", "func": "Team", "text": "Sample inbound Deadline", "type": "deadline", "bold": true, "fill": "FFFF6565"}, {"date": "2026-10-12", "team": "w2", "func": "Team", "text": "Sample inbound Deadline", "type": "deadline", "bold": true, "fill": "FFFF6565"}, {"date": "2026-10-12", "team": "w3", "func": "Team", "text": "Sample inbound Deadline", "type": "deadline", "bold": true, "fill": "FFFF6565"}, {"date": "2026-10-12", "team": "w4", "func": "Team", "text": "Sample inbound Deadline", "type": "deadline", "bold": true, "fill": "FFFF6565"}, {"date": "2026-10-12", "team": "ss2acc", "func": "Team", "text": "2nd TS CEO Convention (모자 가방)", "type": "convention", "bold": true, "fill": null}, {"date": "2026-10-12", "team": "bag", "func": "Team", "text": "CEO convention", "type": "convention", "bold": true, "fill": "FFFF99FF"}, {"date": "2026-10-12", "team": "cap", "func": "Team", "text": "CEO convention", "type": "convention", "bold": true, "fill": "FFFF99FF"}, {"date": "2026-10-12", "team": "sh", "func": "Team", "text": "CEO convention", "type": "convention", "bold": true, "fill": "FFFF99FF"}, {"date": "2026-10-13", "team": "ss2", "func": "Team", "text": "샘플 스튜디오 전달 Review", "type": "feedback", "bold": false, "fill": null}, {"date": "2026-10-13", "team": "ss2acc", "func": "Team", "text": "번역 완료 및 2nd TS RAW Full Package 완료 - 글로벌 공유", "type": "task", "bold": true, "fill": null}, {"date": "2026-10-13", "team": "bag", "func": "Team", "text": "Review", "type": "feedback", "bold": true, "fill": null}, {"date": "2026-10-13", "team": "cap", "func": "Team", "text": "Review", "type": "feedback", "bold": true, "fill": null}, {"date": "2026-10-13", "team": "sh", "func": "Team", "text": "Review", "type": "feedback", "bold": true, "fill": null}, {"date": "2026-10-14", "team": "ss2", "func": "Team", "text": "번역 완료 및 2nd TS RAW Full Package 완료 - 글로벌 공유", "type": "task", "bold": true, "fill": null}, {"date": "2026-10-14", "team": "k1", "func": "Team", "text": "CEO convention", "type": "convention", "bold": true, "fill": "FFFF99FF"}, {"date": "2026-10-14", "team": "k2", "func": "Team", "text": "CEO convention", "type": "convention", "bold": true, "fill": "FFFF99FF"}, {"date": "2026-10-14", "team": "k3", "func": "Team", "text": "CEO convention", "type": "convention", "bold": true, "fill": "FFFF99FF"}, {"date": "2026-10-14", "team": "sw", "func": "Team", "text": "CEO convention", "type": "convention", "bold": true, "fill": "FFFF99FF"}, {"date": "2026-10-14", "team": "dn", "func": "Team", "text": "CEO convention", "type": "convention", "bold": true, "fill": "FFFF99FF"}, {"date": "2026-10-14", "team": "w1", "func": "Team", "text": "CEO convention", "type": "convention", "bold": true, "fill": "FFFF99FF"}, {"date": "2026-10-14", "team": "w2", "func": "Team", "text": "CEO convention", "type": "convention", "bold": true, "fill": "FFFF99FF"}, {"date": "2026-10-14", "team": "w3", "func": "Team", "text": "CEO convention", "type": "convention", "bold": true, "fill": "FFFF99FF"}, {"date": "2026-10-14", "team": "w4", "func": "Team", "text": "CEO convention", "type": "convention", "bold": true, "fill": "FFFF99FF"}, {"date": "2026-10-14", "team": "ss2acc", "func": "Team", "text": "2nd TS CEO Convention (의류/신발)", "type": "convention", "bold": true, "fill": null}, {"date": "2026-10-15", "team": "ss2", "func": "Design", "text": "상품설명서 deadline", "type": "deadline", "bold": false, "fill": null}, {"date": "2026-10-15", "team": "ss2", "func": "Cate Oper/MKT", "text": "샘플 전달", "type": "sample", "bold": false, "fill": null}, {"date": "2026-10-15", "team": "k1", "func": "Team", "text": "Review", "type": "feedback", "bold": true, "fill": null}, {"date": "2026-10-15", "team": "k2", "func": "Team", "text": "Review", "type": "feedback", "bold": true, "fill": null}, {"date": "2026-10-15", "team": "k3", "func": "Team", "text": "Review", "type": "feedback", "bold": true, "fill": null}, {"date": "2026-10-15", "team": "sw", "func": "Team", "text": "Review", "type": "feedback", "bold": true, "fill": null}, {"date": "2026-10-15", "team": "dn", "func": "Team", "text": "Review", "type": "feedback", "bold": true, "fill": null}, {"date": "2026-10-15", "team": "w1", "func": "Team", "text": "Review", "type": "feedback", "bold": true, "fill": null}, {"date": "2026-10-15", "team": "w2", "func": "Team", "text": "Review", "type": "feedback", "bold": true, "fill": null}, {"date": "2026-10-15", "team": "w3", "func": "Team", "text": "Review", "type": "feedback", "bold": true, "fill": null}, {"date": "2026-10-15", "team": "w4", "func": "Team", "text": "Review", "type": "feedback", "bold": true, "fill": null}, {"date": "2026-10-15", "team": "ss2acc", "func": "Team", "text": "샘플 스튜디오 전달", "type": "sample", "bold": false, "fill": null}, {"date": "2026-10-16", "team": "ss2", "func": "Team", "text": "2nd TS KR 1st Qty Feedback - RAW", "type": "feedback", "bold": true, "fill": null}, {"date": "2026-10-16", "team": "ss2", "func": "MD", "text": "RAW fullpakage 배포", "type": "task", "bold": false, "fill": null}, {"date": "2026-10-16", "team": "ss2", "func": "Cate Oper/MKT", "text": "한국 물량 1차 feedback", "type": "feedback", "bold": false, "fill": null}, {"date": "2026-10-16", "team": "ss2acc", "func": "Team", "text": "2nd TS KR 1st Qty Feedback - RAW", "type": "feedback", "bold": true, "fill": null}, {"date": "2026-10-16", "team": "cap", "func": "Team", "text": "1차 품평 PLM 마감 (협의필요)", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-10-19", "team": "ss2", "func": "MD", "text": "수주회용 제품컷 deadline (12시이전)", "type": "deadline", "bold": false, "fill": null}, {"date": "2026-10-19", "team": "ss2", "func": "Cate Oper/MKT", "text": "제품컷 받음", "type": "task", "bold": false, "fill": null}, {"date": "2026-10-20", "team": "bag", "func": "Team", "text": "1차 품평 PLM 마감", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-10-21", "team": "ss2", "func": "Team", "text": "27S Q2 Tradeshow", "type": "tradeshow", "bold": true, "fill": "FFFF00FF"}, {"date": "2026-10-21", "team": "ss2acc", "func": "Team", "text": "27S Q2 Tradeshow", "type": "tradeshow", "bold": true, "fill": "FFFF00FF"}, {"date": "2026-10-22", "team": "ss2", "func": "Team", "text": "REVIEW", "type": "feedback", "bold": true, "fill": "FFFF00FF"}, {"date": "2026-10-22", "team": "ss2", "func": "MD", "text": "Requast Meeting", "type": "task", "bold": false, "fill": null}, {"date": "2026-10-22", "team": "ss2", "func": "Chn/SEA", "text": "Requast Meeting or Feedback", "type": "feedback", "bold": false, "fill": null}, {"date": "2026-10-22", "team": "ss2acc", "func": "Team", "text": "REVIEW", "type": "feedback", "bold": true, "fill": "FFFF00FF"}, {"date": "2026-10-23", "team": "ss2", "func": "Team", "text": "2nd TS 1st Qty Feedback (KR/CN/SEA)", "type": "feedback", "bold": true, "fill": "FFFF00FF"}, {"date": "2026-10-23", "team": "ss2", "func": "Chn/SEA", "text": "1st Order Qty Feedback", "type": "feedback", "bold": false, "fill": null}, {"date": "2026-10-23", "team": "ss2", "func": "Cate Oper/MKT", "text": "1st Order Qty Feedback", "type": "feedback", "bold": false, "fill": null}, {"date": "2026-10-23", "team": "k1", "func": "Team", "text": "1차 품평 PLM 마감", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-10-23", "team": "k2", "func": "Team", "text": "1차 품평 PLM 마감", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-10-23", "team": "k3", "func": "Team", "text": "1차 품평 PLM 마감", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-10-23", "team": "sw", "func": "Team", "text": "1차 품평 PLM 마감", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-10-23", "team": "dn", "func": "Team", "text": "1차 품평 PLM 마감", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-10-23", "team": "w1", "func": "Team", "text": "1차 품평 PLM 마감", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-10-23", "team": "w2", "func": "Team", "text": "1차 품평 PLM 마감", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-10-23", "team": "w3", "func": "Team", "text": "1차 품평 PLM 마감", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-10-23", "team": "w4", "func": "Team", "text": "1차 품평 PLM 마감", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-10-23", "team": "ss2acc", "func": "Team", "text": "2nd TS 1st Qty Feedback (KR/CN/SEA)", "type": "feedback", "bold": true, "fill": "FFFF00FF"}, {"date": "2026-10-26", "team": "ss2", "func": "Team", "text": "Go&Drop 점검 -소싱팀 / 협력업체 확정", "type": "order", "bold": true, "fill": null}, {"date": "2026-10-26", "team": "ss2", "func": "Chn/SEA", "text": "Final Qty Feedback", "type": "feedback", "bold": false, "fill": null}, {"date": "2026-10-26", "team": "ss2", "func": "Cate Oper/MKT", "text": "Final Qty Feedback", "type": "feedback", "bold": false, "fill": null}, {"date": "2026-10-26", "team": "k2", "func": "Team", "text": "2차(전컬러) 소재 입고 시작", "type": "fabric", "bold": true, "fill": null}, {"date": "2026-10-26", "team": "k3", "func": "Team", "text": "2차(전컬러) 소재 입고 시작", "type": "fabric", "bold": true, "fill": null}, {"date": "2026-10-26", "team": "ss2acc", "func": "Team", "text": "Go&Drop 점검 -소싱팀 / 협력업체 확정", "type": "order", "bold": true, "fill": null}, {"date": "2026-10-27", "team": "ss2", "func": "Team", "text": "Drop 리스트 공유 및 확정", "type": "order", "bold": true, "fill": null}, {"date": "2026-10-27", "team": "ss2acc", "func": "Team", "text": "Drop 리스트 공유 및 확정", "type": "order", "bold": true, "fill": null}, {"date": "2026-10-28", "team": "ss2", "func": "Chn/SEA", "text": "Final Qty Feedback", "type": "feedback", "bold": false, "fill": null}, {"date": "2026-10-28", "team": "ss2", "func": "Cate Oper/MKT", "text": "Final Qty Feedback", "type": "feedback", "bold": false, "fill": null}, {"date": "2026-10-29", "team": "ss2", "func": "Team", "text": "최종 물량 확정 > MERP 등록", "type": "order", "bold": true, "fill": null}, {"date": "2026-10-29", "team": "ss2", "func": "Chn/SEA", "text": "CHN- BOP Upload Deadline", "type": "deadline", "bold": true, "fill": "FFFF6565"}, {"date": "2026-10-29", "team": "ss2acc", "func": "Team", "text": "최종 물량 확정 > MERP 등록", "type": "order", "bold": true, "fill": null}, {"date": "2026-10-30", "team": "ss2", "func": "Team", "text": "GLB TTL PR & PO & PLM Deadline", "type": "deadline", "bold": true, "fill": "FFFF6565"}, {"date": "2026-10-30", "team": "ss2", "func": "Design", "text": "Main PLM Deadline", "type": "deadline", "bold": true, "fill": "FFFF6565"}, {"date": "2026-10-30", "team": "ss2", "func": "Sourcing", "text": "PO Approval Deadline", "type": "deadline", "bold": true, "fill": "FFFF6565"}, {"date": "2026-10-30", "team": "ss2", "func": "Chn/SEA", "text": "SEA- PR Appraval Deadline", "type": "deadline", "bold": true, "fill": "FFFF6565"}, {"date": "2026-10-30", "team": "ss2", "func": "Cate Oper/MKT", "text": "PR 결재마감 (오전까지)", "type": "deadline", "bold": true, "fill": "FFFF6565"}, {"date": "2026-10-30", "team": "k2", "func": "Team", "text": "2차(전컬러) 소재 입고 마무리", "type": "fabric", "bold": true, "fill": null}, {"date": "2026-10-30", "team": "k3", "func": "Team", "text": "2차(전컬러) 소재 입고 마무리", "type": "fabric", "bold": true, "fill": null}, {"date": "2026-10-30", "team": "ss2acc", "func": "Team", "text": "GLB TTL PR & PO & PLM Deadline", "type": "deadline", "bold": true, "fill": "FFFF6565"}, {"date": "2026-11-02", "team": "ss2", "func": "Sourcing", "text": "PO Approval Deadline\n금요일 못한 것 나머지", "type": "deadline", "bold": false, "fill": null}, {"date": "2026-11-02", "team": "k1", "func": "Team", "text": "2차(전컬러) 소재 입고 시작", "type": "fabric", "bold": true, "fill": null}, {"date": "2026-11-02", "team": "w1", "func": "Team", "text": "2차(전컬러) 소재 입고 시작", "type": "fabric", "bold": true, "fill": null}, {"date": "2026-11-02", "team": "w3", "func": "Team", "text": "2차(전컬러) 소재 입고 시작", "type": "fabric", "bold": true, "fill": null}, {"date": "2026-11-02", "team": "w4", "func": "Team", "text": "2차(전컬러) 소재 입고 시작", "type": "fabric", "bold": true, "fill": null}, {"date": "2026-11-04", "team": "k1", "func": "Team", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "k2", "func": "Team", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "k3", "func": "Team", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "k3", "func": "MD", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "k3", "func": "Design", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "k3", "func": "Sourcing", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "k3", "func": "Chn/SEA", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "k3", "func": "Cate Oper/MKT", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "sw", "func": "Team", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "sw", "func": "MD", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "sw", "func": "Design", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "sw", "func": "Sourcing", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "sw", "func": "Chn/SEA", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "sw", "func": "Cate Oper/MKT", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "dn", "func": "Team", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "dn", "func": "MD", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "dn", "func": "Design", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "dn", "func": "Sourcing", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "dn", "func": "Chn/SEA", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "dn", "func": "Cate Oper/MKT", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "w1", "func": "Team", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "w1", "func": "MD", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "w1", "func": "Design", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "w1", "func": "Sourcing", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "w1", "func": "Chn/SEA", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "w1", "func": "Cate Oper/MKT", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "w2", "func": "Team", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "w2", "func": "MD", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "w2", "func": "Design", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "w2", "func": "Sourcing", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "w2", "func": "Chn/SEA", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "w2", "func": "Cate Oper/MKT", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "w3", "func": "Team", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FFFFFF00"}, {"date": "2026-11-04", "team": "w3", "func": "MD", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FF00B0F0"}, {"date": "2026-11-04", "team": "w3", "func": "Design", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FF00B0F0"}, {"date": "2026-11-04", "team": "w3", "func": "Sourcing", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FF00B0F0"}, {"date": "2026-11-04", "team": "w3", "func": "Chn/SEA", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FF00B0F0"}, {"date": "2026-11-04", "team": "w3", "func": "Cate Oper/MKT", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FF00B0F0"}, {"date": "2026-11-04", "team": "w4", "func": "Team", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FF00B0F0"}, {"date": "2026-11-04", "team": "bag", "func": "Team", "text": "사양, T&A, MCQ 최종회의 및 RAW 업데이트", "type": "task", "bold": false, "fill": null}, {"date": "2026-11-04", "team": "sh", "func": "Team", "text": "Pre-order convention", "type": "convention", "bold": true, "fill": "FF00B0F0"}, {"date": "2026-11-06", "team": "k1", "func": "Team", "text": "2차(전컬러) 소재 입고 마무리", "type": "fabric", "bold": true, "fill": null}, {"date": "2026-11-06", "team": "w1", "func": "Team", "text": "2차(전컬러) 소재 입고 마무리", "type": "fabric", "bold": true, "fill": null}, {"date": "2026-11-06", "team": "w3", "func": "Team", "text": "2차(전컬러) 소재 입고 마무리", "type": "fabric", "bold": true, "fill": null}, {"date": "2026-11-06", "team": "w4", "func": "Team", "text": "2차(전컬러) 소재 입고 마무리", "type": "fabric", "bold": true, "fill": null}, {"date": "2026-11-06", "team": "bag", "func": "Team", "text": "수주샘플 디테일 FIX", "type": "sample", "bold": false, "fill": null}, {"date": "2026-11-13", "team": "k1", "func": "Team", "text": "Pre-order deadline", "type": "deadline", "bold": true, "fill": null}, {"date": "2026-11-13", "team": "k2", "func": "Team", "text": "Pre-order deadline", "type": "deadline", "bold": true, "fill": null}, {"date": "2026-11-13", "team": "k3", "func": "Team", "text": "Pre-order deadline", "type": "deadline", "bold": true, "fill": null}, {"date": "2026-11-13", "team": "sw", "func": "Team", "text": "Pre-order deadline", "type": "deadline", "bold": true, "fill": null}, {"date": "2026-11-13", "team": "dn", "func": "Team", "text": "Pre-order deadline", "type": "deadline", "bold": true, "fill": null}, {"date": "2026-11-13", "team": "w1", "func": "Team", "text": "Pre-order deadline", "type": "deadline", "bold": true, "fill": null}, {"date": "2026-11-13", "team": "w2", "func": "Team", "text": "Pre-order deadline", "type": "deadline", "bold": true, "fill": null}, {"date": "2026-11-13", "team": "w3", "func": "Team", "text": "Pre-order deadline", "type": "deadline", "bold": true, "fill": null}, {"date": "2026-11-13", "team": "w4", "func": "Team", "text": "Pre-order deadline", "type": "deadline", "bold": true, "fill": null}, {"date": "2026-11-13", "team": "bag", "func": "Team", "text": "Pre-order deadline", "type": "deadline", "bold": true, "fill": null}, {"date": "2026-11-13", "team": "sh", "func": "Team", "text": "Pre-order deadline", "type": "deadline", "bold": true, "fill": null}, {"date": "2026-11-24", "team": "misc", "func": "Team", "text": "품평 샘플 review", "type": "convention", "bold": true, "fill": null}, {"date": "2026-11-25", "team": "misc", "func": "Team", "text": "27FW CEO 품평회  최종", "type": "convention", "bold": true, "fill": "FFFF00FF"}, {"date": "2026-11-26", "team": "misc", "func": "Team", "text": "품평 샘플 review", "type": "convention", "bold": true, "fill": null}, {"date": "2026-11-27", "team": "misc", "func": "Team", "text": "Order Sheet 세팅 및 공유 완료", "type": "task", "bold": false, "fill": null}, {"date": "2026-12-11", "team": "w2", "func": "Team", "text": "2차샘플입고마감", "type": "deadline", "bold": true, "fill": null}, {"date": "2026-12-11", "team": "bag", "func": "Team", "text": "2차 품평 샘플 입고 완료", "type": "convention", "bold": true, "fill": null}, {"date": "2026-12-11", "team": "cap", "func": "Team", "text": "2차 품평 샘플 입고 완료", "type": "convention", "bold": true, "fill": null}, {"date": "2026-12-11", "team": "sh", "func": "Team", "text": "2차 품평 샘플 입고 완료", "type": "convention", "bold": true, "fill": null}, {"date": "2026-12-16", "team": "w2", "func": "Team", "text": "2차 품평", "type": "convention", "bold": true, "fill": "FF92D050"}, {"date": "2026-12-16", "team": "bag", "func": "Team", "text": "2차 품평", "type": "convention", "bold": true, "fill": "FFCC66FF"}, {"date": "2026-12-16", "team": "cap", "func": "Team", "text": "2차 품평", "type": "convention", "bold": true, "fill": "FF00B0F0"}, {"date": "2026-12-16", "team": "sh", "func": "Team", "text": "2차 품평", "type": "convention", "bold": true, "fill": "FF00B0F0"}, {"date": "2026-12-17", "team": "w2", "func": "Team", "text": "품평 REVIEW", "type": "convention", "bold": false, "fill": null}, {"date": "2026-12-17", "team": "bag", "func": "Team", "text": "품평 REVIEW", "type": "convention", "bold": false, "fill": null}, {"date": "2026-12-17", "team": "cap", "func": "Team", "text": "품평 REVIEW", "type": "convention", "bold": false, "fill": null}, {"date": "2026-12-17", "team": "sh", "func": "Team", "text": "품평 REVIEW", "type": "convention", "bold": false, "fill": null}, {"date": "2026-12-18", "team": "k1", "func": "Team", "text": "2차샘플입고마감", "type": "deadline", "bold": true, "fill": null}, {"date": "2026-12-18", "team": "k2", "func": "Team", "text": "2차샘플입고마감", "type": "deadline", "bold": true, "fill": null}, {"date": "2026-12-18", "team": "k3", "func": "Team", "text": "2차샘플입고마감", "type": "deadline", "bold": true, "fill": null}, {"date": "2026-12-18", "team": "sw", "func": "Team", "text": "2차샘플입고마감", "type": "deadline", "bold": true, "fill": null}, {"date": "2026-12-18", "team": "dn", "func": "Team", "text": "2차샘플입고마감", "type": "deadline", "bold": true, "fill": null}, {"date": "2026-12-18", "team": "w1", "func": "Team", "text": "2차샘플입고마감", "type": "deadline", "bold": true, "fill": null}, {"date": "2026-12-18", "team": "w3", "func": "Team", "text": "2차샘플입고마감", "type": "deadline", "bold": true, "fill": null}, {"date": "2026-12-18", "team": "w4", "func": "Team", "text": "2차샘플입고마감", "type": "deadline", "bold": true, "fill": null}, {"date": "2026-12-23", "team": "k1", "func": "Team", "text": "2차 품평", "type": "convention", "bold": true, "fill": "FFCC66FF"}, {"date": "2026-12-23", "team": "k2", "func": "Team", "text": "2차 품평", "type": "convention", "bold": true, "fill": "FFCC66FF"}, {"date": "2026-12-23", "team": "k3", "func": "Team", "text": "2차 품평", "type": "convention", "bold": true, "fill": "FFCC66FF"}, {"date": "2026-12-23", "team": "sw", "func": "Team", "text": "2차 품평", "type": "convention", "bold": true, "fill": "FFFFC000"}, {"date": "2026-12-23", "team": "dn", "func": "Team", "text": "2차 품평", "type": "convention", "bold": true, "fill": null}, {"date": "2026-12-23", "team": "w1", "func": "Team", "text": "2차 품평", "type": "convention", "bold": true, "fill": null}, {"date": "2026-12-23", "team": "w3", "func": "Team", "text": "2차 품평", "type": "convention", "bold": true, "fill": "FF92D050"}, {"date": "2026-12-23", "team": "w4", "func": "Team", "text": "2차 품평", "type": "convention", "bold": true, "fill": "FF92D050"}, {"date": "2026-12-23", "team": "misc", "func": "Team", "text": "수주전리뷰삭제", "type": "feedback", "bold": false, "fill": null}, {"date": "2026-12-24", "team": "k1", "func": "Team", "text": "품평 REVIEW", "type": "convention", "bold": false, "fill": null}, {"date": "2026-12-24", "team": "k2", "func": "Team", "text": "품평 REVIEW", "type": "convention", "bold": false, "fill": null}, {"date": "2026-12-24", "team": "k3", "func": "Team", "text": "품평 REVIEW", "type": "convention", "bold": false, "fill": null}, {"date": "2026-12-24", "team": "sw", "func": "Team", "text": "품평 REVIEW", "type": "convention", "bold": false, "fill": null}, {"date": "2026-12-24", "team": "dn", "func": "Team", "text": "품평 REVIEW", "type": "convention", "bold": false, "fill": null}, {"date": "2026-12-24", "team": "w1", "func": "Team", "text": "품평 REVIEW", "type": "convention", "bold": false, "fill": null}, {"date": "2026-12-24", "team": "w3", "func": "Team", "text": "품평 REVIEW", "type": "convention", "bold": false, "fill": null}, {"date": "2026-12-24", "team": "w4", "func": "Team", "text": "품평 REVIEW", "type": "convention", "bold": false, "fill": null}, {"date": "2027-01-13", "team": "k1", "func": "Team", "text": "27FW CN TRADESHOW", "type": "tradeshow", "bold": true, "fill": "FFFF99FF"}, {"date": "2027-01-13", "team": "k2", "func": "Team", "text": "27FW CN TRADESHOW", "type": "tradeshow", "bold": true, "fill": "FFFF99FF"}, {"date": "2027-01-13", "team": "k3", "func": "Team", "text": "27FW CN TRADESHOW", "type": "tradeshow", "bold": true, "fill": "FFFF99FF"}, {"date": "2027-01-13", "team": "sw", "func": "Team", "text": "27FW CN TRADESHOW", "type": "tradeshow", "bold": true, "fill": "FFFF99FF"}, {"date": "2027-01-13", "team": "dn", "func": "Team", "text": "27FW CN TRADESHOW", "type": "tradeshow", "bold": true, "fill": "FFFF99FF"}, {"date": "2027-01-13", "team": "w1", "func": "Team", "text": "27FW CN TRADESHOW", "type": "tradeshow", "bold": true, "fill": "FFFF99FF"}, {"date": "2027-01-13", "team": "w2", "func": "Team", "text": "27FW CN TRADESHOW", "type": "tradeshow", "bold": true, "fill": "FFFF99FF"}, {"date": "2027-01-13", "team": "w3", "func": "Team", "text": "27FW CN TRADESHOW", "type": "tradeshow", "bold": true, "fill": "FFFF99FF"}, {"date": "2027-01-13", "team": "w4", "func": "Team", "text": "27FW CN TRADESHOW", "type": "tradeshow", "bold": true, "fill": "FFFF99FF"}, {"date": "2027-01-13", "team": "bag", "func": "Team", "text": "27FW CN TRADESHOW", "type": "tradeshow", "bold": true, "fill": "FFFF99FF"}, {"date": "2027-01-13", "team": "cap", "func": "Team", "text": "27FW CN TRADESHOW", "type": "tradeshow", "bold": true, "fill": "FFFF99FF"}, {"date": "2027-01-13", "team": "sh", "func": "Team", "text": "27FW CN TRADESHOW", "type": "tradeshow", "bold": true, "fill": "FFFF99FF"}, {"date": "2027-01-18", "team": "k1", "func": "Team", "text": "OMS 정보 입력 완료", "type": "order", "bold": true, "fill": null}, {"date": "2027-01-18", "team": "k2", "func": "Team", "text": "OMS 정보 입력 완료", "type": "order", "bold": true, "fill": null}, {"date": "2027-01-18", "team": "k3", "func": "Team", "text": "OMS 정보 입력 완료", "type": "order", "bold": true, "fill": null}, {"date": "2027-01-18", "team": "dn", "func": "Team", "text": "OMS 정보 입력 완료", "type": "order", "bold": true, "fill": null}, {"date": "2027-01-18", "team": "w1", "func": "Team", "text": "OMS 정보 입력 완료", "type": "order", "bold": true, "fill": null}, {"date": "2027-01-18", "team": "w3", "func": "Team", "text": "OMS 정보 입력 완료", "type": "order", "bold": true, "fill": null}, {"date": "2027-01-18", "team": "w4", "func": "Team", "text": "OMS 정보 입력 완료", "type": "order", "bold": true, "fill": null}, {"date": "2027-01-18", "team": "bag", "func": "Team", "text": "OMS 정보 입력 완료", "type": "order", "bold": true, "fill": null}, {"date": "2027-01-18", "team": "cap", "func": "Team", "text": "OMS 정보 입력 완료", "type": "order", "bold": true, "fill": null}, {"date": "2027-01-18", "team": "sh", "func": "Team", "text": "OMS 정보 입력 완료", "type": "order", "bold": true, "fill": null}, {"date": "2027-01-20", "team": "k1", "func": "Team", "text": "PR 마감", "type": "deadline", "bold": true, "fill": "FF92D050"}, {"date": "2027-01-20", "team": "k2", "func": "Team", "text": "PR 마감", "type": "deadline", "bold": true, "fill": "FF92D050"}, {"date": "2027-01-20", "team": "k3", "func": "Team", "text": "PR 마감", "type": "deadline", "bold": true, "fill": "FF92D050"}, {"date": "2027-01-20", "team": "dn", "func": "Team", "text": "PR 마감", "type": "deadline", "bold": true, "fill": "FF92D050"}, {"date": "2027-01-20", "team": "w1", "func": "Team", "text": "PR 마감", "type": "deadline", "bold": true, "fill": "FF92D050"}, {"date": "2027-01-20", "team": "w3", "func": "Team", "text": "PR 마감", "type": "deadline", "bold": true, "fill": "FF92D050"}, {"date": "2027-01-20", "team": "w4", "func": "Team", "text": "PR 마감", "type": "deadline", "bold": true, "fill": "FF92D050"}, {"date": "2027-01-20", "team": "bag", "func": "Team", "text": "PR 마감", "type": "deadline", "bold": true, "fill": "FF92D050"}, {"date": "2027-01-20", "team": "cap", "func": "Team", "text": "PR 마감", "type": "deadline", "bold": true, "fill": "FF92D050"}, {"date": "2027-01-22", "team": "k1", "func": "Team", "text": "PO 마감 / PLM 마감 (우븐/니트/용품)", "type": "deadline", "bold": true, "fill": "FF92D050"}, {"date": "2027-01-22", "team": "k2", "func": "Team", "text": "PO 마감 / PLM 마감 (우븐/니트/용품)", "type": "deadline", "bold": true, "fill": "FF92D050"}, {"date": "2027-01-22", "team": "k3", "func": "Team", "text": "PO 마감 / PLM 마감 (우븐/니트/용품)", "type": "deadline", "bold": true, "fill": "FF92D050"}, {"date": "2027-01-22", "team": "dn", "func": "Team", "text": "PO 마감 / PLM 마감 (우븐/니트/용품)", "type": "deadline", "bold": true, "fill": "FF92D050"}, {"date": "2027-01-22", "team": "w1", "func": "Team", "text": "11월마감 DCS 소재입고 완료\nPO 마감 / PLM 마감 (우븐/니트/용품)", "type": "deadline", "bold": true, "fill": "FFFFFF00"}, {"date": "2027-01-22", "team": "w3", "func": "Team", "text": "PO 마감 / PLM 마감 (우븐/니트/용품)", "type": "deadline", "bold": true, "fill": "FF92D050"}, {"date": "2027-01-22", "team": "w4", "func": "Team", "text": "11월마감 DCS 소재입고 완료\nPO 마감 / PLM 마감 (우븐/니트/용품)", "type": "deadline", "bold": true, "fill": "FFFFFF00"}, {"date": "2027-01-22", "team": "bag", "func": "Team", "text": "PO 마감 / PLM 마감 (우븐/니트/용품)", "type": "deadline", "bold": true, "fill": "FF92D050"}, {"date": "2027-01-22", "team": "cap", "func": "Team", "text": "PR 마감 / PO 마감 / PLM 마감", "type": "deadline", "bold": true, "fill": "FF92D050"}, {"date": "2027-01-22", "team": "sh", "func": "Team", "text": "PR 마감 / PO 마감 / PLM 마감", "type": "deadline", "bold": true, "fill": "FF92D050"}, {"date": "2027-03-08", "team": "k2", "func": "Team", "text": "Q2 샘플 입고 시작(10월마감)", "type": "deadline", "bold": false, "fill": "FFFF6565"}, {"date": "2027-03-08", "team": "k3", "func": "Team", "text": "Q2 샘플 입고 시작(10월마감)", "type": "deadline", "bold": false, "fill": "FFFF6565"}, {"date": "2027-03-08", "team": "dn", "func": "Team", "text": "Q2 샘플 입고 시작(10월마감)", "type": "deadline", "bold": false, "fill": "FFFF6565"}, {"date": "2027-03-08", "team": "w1", "func": "Team", "text": "Q2 샘플 입고 시작(10월마감)", "type": "deadline", "bold": false, "fill": "FFFF6565"}, {"date": "2027-03-08", "team": "bag", "func": "Team", "text": "Q2 샘플 입고 시작(10월마감)", "type": "deadline", "bold": false, "fill": "FFFF6565"}, {"date": "2027-03-17", "team": "k2", "func": "Team", "text": "Q2 품평", "type": "convention", "bold": true, "fill": "FFFFC000"}, {"date": "2027-03-17", "team": "k3", "func": "Team", "text": "Q2 품평", "type": "convention", "bold": true, "fill": "FFFFC000"}, {"date": "2027-03-17", "team": "dn", "func": "Team", "text": "Q2 품평", "type": "convention", "bold": true, "fill": "FFFFC000"}, {"date": "2027-03-17", "team": "w1", "func": "Team", "text": "Q2 품평", "type": "convention", "bold": true, "fill": "FFFFC000"}, {"date": "2027-03-17", "team": "w3", "func": "Team", "text": "Q2 품평", "type": "convention", "bold": true, "fill": "FFFFC000"}, {"date": "2027-03-17", "team": "bag", "func": "Team", "text": "Q2 품평", "type": "convention", "bold": true, "fill": "FFFFC000"}, {"date": "2027-03-22", "team": "misc", "func": "Team", "text": "9월 입고 목표", "type": "task", "bold": false, "fill": null}, {"date": "2027-03-24", "team": "k2", "func": "Team", "text": "27FW CN Q2 TRADESHOW", "type": "tradeshow", "bold": true, "fill": "FFFF00FF"}, {"date": "2027-03-24", "team": "k3", "func": "Team", "text": "27FW CN Q2 TRADESHOW", "type": "tradeshow", "bold": true, "fill": "FFFF00FF"}, {"date": "2027-03-24", "team": "dn", "func": "Team", "text": "27FW CN Q2 TRADESHOW", "type": "tradeshow", "bold": true, "fill": "FFFF00FF"}, {"date": "2027-03-24", "team": "w1", "func": "Team", "text": "27FW CN Q2 TRADESHOW", "type": "tradeshow", "bold": true, "fill": "FFFF00FF"}, {"date": "2027-03-24", "team": "w3", "func": "Team", "text": "27FW CN Q2 TRADESHOW", "type": "tradeshow", "bold": true, "fill": "FFFF00FF"}, {"date": "2027-03-24", "team": "bag", "func": "Team", "text": "27FW CN Q2 TRADESHOW", "type": "tradeshow", "bold": true, "fill": "FFFF00FF"}, {"date": "2027-03-29", "team": "w1", "func": "Team", "text": "Q3 샘플 입고 시작(11월마감)", "type": "deadline", "bold": false, "fill": "FFFF6565"}, {"date": "2027-03-29", "team": "w4", "func": "Team", "text": "Q3 샘플 입고 시작(11월마감)", "type": "deadline", "bold": false, "fill": "FFFF6565"}, {"date": "2027-04-05", "team": "w1", "func": "Team", "text": "Q3 품평", "type": "convention", "bold": true, "fill": "FFFFC000"}, {"date": "2027-04-05", "team": "w4", "func": "Team", "text": "Q3 품평", "type": "convention", "bold": true, "fill": "FFFFC000"}, {"date": "2027-04-07", "team": "w1", "func": "Team", "text": "27FW CN Q3 TRADESHOW", "type": "tradeshow", "bold": true, "fill": "FFFF00FF"}, {"date": "2027-04-07", "team": "w4", "func": "Team", "text": "27FW CN Q3 TRADESHOW", "type": "tradeshow", "bold": true, "fill": "FFFF00FF"}]};
+const ROSTER = {"w1": {"기획": ["최성진"], "디자인": ["정혜윤", "채수민"], "소재": ["유정수"], "소싱": ["황려나", "심승호"], "자재": ["김영식", "초선평"], "QM": ["김은정(TD)", "주현정(QA)"], "운영": ["김윤지"]}, "w2": {"기획": ["김재욱"], "디자인": ["김규리", "유재연"], "소재": ["한은서"], "소싱": ["심승호", "신도희"], "자재": ["초선평", "김영식"], "QM": ["권수빈(TD)", "김서진(TD)", "주현정(QA)"]}, "w3": {"기획": ["정수진"], "디자인": ["전미연", "유재연"], "소재": ["이영미"], "소싱": ["황려나", "심승호"], "자재": ["초선평", "김영식"], "QM": ["김은정(TD)", "주현정(QA)"]}, "w4": {"기획": ["곽화윤"], "디자인": ["이향", "임은서", "강선예"], "소재": ["한은서"], "소싱": ["신도희"], "자재": ["김영식", "초선평"], "QM": ["권수빈(TD)", "홍문정(QA)"], "운영": ["차하민"]}, "dn": {"기획": ["남승지"], "디자인": ["김민재"], "소싱": ["정영림", "황려나"], "자재": ["김영식"], "QM": ["김서진(TD)", "홍문정(QA)"]}, "k1": {"기획": ["김연수"], "디자인": ["정예지", "김민수", "유승은", "황상희"], "소재": ["최수연"], "소싱": ["고은아", "전서하"], "자재": ["강석필", "심승연"], "QM": ["손은지(TD)", "이은주(QA)"], "운영": ["이승미"]}, "k2": {"기획": ["위소은"], "디자인": ["이은혜", "문지현", "최누리", "이예원"], "소재": ["이영미"], "소싱": ["임규빈", "김태진"], "자재": ["심승연", "강석필"], "QM": ["손은지(TD)", "이은주(QA)"]}, "k3": {"기획": ["강민영"], "디자인": ["권유나", "이예원"], "소재": ["최수연"], "소싱": ["전서하", "고은아"], "자재": ["심승연", "강석필"], "QM": ["지수현(TD)", "이은주(QA)"]}, "sw": {"기획": ["남승지"], "디자인": ["황정윤"], "소싱": ["김태진", "임규빈"], "QM": ["손은지(TD)", "김수빈(QA)"], "운영": ["이승미"]}, "cap": {"기획": ["김현주"], "디자인": ["최지원", "유다애"], "소싱": ["김선희", "김준호", "양정인", "박미희"], "운영": ["김윤지"]}, "sh": {"기획": ["이유나"], "디자인": ["김태헌", "임보라", "김종훈", "유재곤", "박세정"], "소싱": ["우정혁", "임의영", "김성욱", "김민경"], "운영": ["정윤성"]}, "bag": {"기획": ["오주영"], "디자인": ["이빛나", "최수하"], "소싱": ["홍소연", "강준원"], "운영": ["김윤지"]}};
+const TYPES = [
+  ["tradeshow","트레이드쇼"],["convention","품평 / 컨벤션"],["deadline","마감 / Deadline"],["report","보고 / Report"],
+  ["fabric","소재 / 목업"],["tag","TAG / 런칭"],["feedback","피드백 / 리뷰"],["sample","샘플"],["order","물량 / 발주"],["task","일반"]
+];
+const TYPE_LABEL = Object.fromEntries(TYPES);
+const FUNCS = ["Team","MD","Design","Sourcing","Chn/SEA","Cate Oper/MKT"];
+const FUNC_LABEL = {Team:"팀 공통",MD:"MD",Design:"Design",Sourcing:"Sourcing","Chn/SEA":"Chn / SEA","Cate Oper/MKT":"Cate Oper / MKT"};
+const SEASON_OF = t => t.season === "27FW" ? "fw" : "ss2";
+const SEASON_LABEL = {fw:"27FW", ss2:"27SS 2nd TS"};
+const DAYW = {month:5, week:12, day:28};
+const LW = 230;
+const DOW = ["일","월","화","수","목","금","토"];
+const MS_DAY = 86400000;
+
+const teamsByKey = Object.fromEntries(DATA.teams.map(t => [t.key, t]));
+const items = DATA.items.map((it, i) => ({...it, id:i, d:new Date(it.date + "T00:00:00")}));
+items.sort((a,b) => a.d - b.d || a.id - b.id);
+
+const state = {season:"all", view:"tl", zoom:"week", teams:new Set(), funcs:new Set(FUNCS), types:new Set(TYPES.map(t=>t[0])), q:"", common:true, dimPast:false, closed:new Set()};
+try{ const s = JSON.parse(localStorage.getItem("gtm27.state")||"{}"); if(s.zoom) state.zoom=s.zoom; if(s.season) state.season=s.season; if(typeof s.common==="boolean") state.common=s.common; }catch(e){}
+const persist = () => { try{ localStorage.setItem("gtm27.state", JSON.stringify({zoom:state.zoom, season:state.season, common:state.common})); }catch(e){} };
+
+const today = new Date(); today.setHours(0,0,0,0);
+const fmtD = d => `${d.getMonth()+1}/${d.getDate()}`;
+const fmtFull = d => `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getDate()).padStart(2,"0")} (${DOW[d.getDay()]})`;
+const dday = d => { const n = Math.round((d - today)/MS_DAY); return n===0 ? "D-DAY" : n>0 ? `D-${n}` : `D+${-n}`; };
+const norm = s => s.replace(/\([^)]*\)/g,"").replace(/\s+/g," ").trim().toLowerCase();
+const el = (tag, cls, html) => { const e = document.createElement(tag); if(cls) e.className = cls; if(html!=null) e.innerHTML = html; return e; };
+const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+
+/* ---------- filtering ---------- */
+function seasonTeams(){ return DATA.teams.filter(t => state.season==="all" || SEASON_OF(t)===state.season); }
+function visibleTeams(){ const st = seasonTeams(); return state.teams.size ? st.filter(t => state.teams.has(t.key)) : st; }
+function filtered(){
+  const vt = new Set(visibleTeams().map(t=>t.key));
+  const q = state.q.trim().toLowerCase();
+  return items.filter(it => vt.has(it.team) && state.funcs.has(it.func) && state.types.has(it.type) && (!q || it.text.toLowerCase().includes(q)));
+}
+/* common-milestone grouping: same date + same normalized text across several teams of one season */
+function groupCommon(list){
+  const bySeason = {fw:{}, ss2:{}};
+  const seasonCount = {fw:seasonTeams().filter(t=>SEASON_OF(t)==="fw" && t.key!=="misc").length, ss2:seasonTeams().filter(t=>SEASON_OF(t)==="ss2").length};
+  const th = {fw:6, ss2:2};
+  for(const it of list){
+    if(it.team==="misc") continue;
+    const s = SEASON_OF(teamsByKey[it.team]);
+    const k = it.date + "|" + norm(it.text);
+    (bySeason[s][k] ||= []).push(it);
+  }
+  const commonIds = new Set(), commons = {fw:[], ss2:[]};
+  for(const s of ["fw","ss2"]){
+    if(!state.common || seasonCount[s] < 2) continue;
+    for(const [k, arr] of Object.entries(bySeason[s])){
+      const tk = new Set(arr.map(a=>a.team));
+      if(tk.size >= Math.min(th[s], seasonCount[s]) && tk.size >= 2){
+        arr.forEach(a => commonIds.add(a.id));
+        const lead = arr.find(a=>a.func==="Team") || arr[0];
+        commons[s].push({...lead, id:"c"+lead.id, teamsIn:[...tk], func:"Team", common:true, n:tk.size});
+      }
+    }
+    commons[s].sort((a,b)=>a.d-b.d);
+  }
+  return {commonIds, commons};
+}
+
+/* ---------- KPI strip ---------- */
+function renderKpis(list){
+  const box = document.getElementById("kpis"); box.innerHTML = "";
+  const seen = new Map();
+  for(const it of list){
+    if(!(it.type==="tradeshow" || it.type==="convention") || !it.bold) continue;
+    if(/review|리뷰/i.test(it.text)) continue;
+    const k = it.date + "|" + norm(it.text);
+    if(!seen.has(k)) seen.set(k, {...it, teamsIn:new Set()});
+    seen.get(k).teamsIn.add(it.team);
+  }
+  let arr = [...seen.values()];
+  const up = arr.filter(a => a.d >= today), past = arr.filter(a => a.d < today);
+  arr = [...past.slice(-1), ...up].slice(0, 7);
+  if(!arr.length) arr = past.slice(-6);
+  for(const a of arr){
+    const c = el("div", "kpi" + (a.d < today ? " past":""));
+    c.style.setProperty("--c", `var(--c-${a.type})`);
+    const names = [...a.teamsIn].map(k=>teamsByKey[k].name);
+    const sub = names.length > 3 ? `${names.length}개 팀 · ${SEASON_LABEL[SEASON_OF(teamsByKey[a.team])]}` : names.join(", ");
+    c.innerHTML = `<div class="d"><span>${fmtFull(a.d)}</span><b>${dday(a.d)}</b></div><div class="t" title="${esc(a.text)}">${esc(a.text.split("\n")[0])}</div><div class="s">${esc(sub)}</div>`;
+    c.addEventListener("click", () => scrollToDate(a.d));
+    box.appendChild(c);
+  }
+}
+
+/* ---------- sidebar ---------- */
+function renderSide(list){
+  const tl = document.getElementById("teamList"); tl.innerHTML = "";
+  const counts = {}, next = {};
+  for(const it of list){ counts[it.team] = (counts[it.team]||0)+1; if(it.d >= today && !next[it.team]) next[it.team] = it; }
+  for(const t of seasonTeams()){
+    const b = el("button", "team");
+    b.setAttribute("aria-pressed", state.teams.has(t.key) ? "true" : "false");
+    if(state.teams.size && !state.teams.has(t.key)) b.classList.add("dim");
+    const nx = next[t.key];
+    b.innerHTML = `<span class="n">${esc(t.name)}</span><span class="c">${t.codes ? esc(t.codes) : ""} · ${counts[t.key]||0}</span>
+      <span class="nx">${nx ? `<b>${fmtD(nx.d)} ${dday(nx.d)}</b>${esc(nx.text.split("\n")[0])}` : "예정 일정 없음"}</span>`;
+    b.title = rosterText(t.key);
+    b.addEventListener("click", ev => {
+      if(ev.shiftKey || ev.ctrlKey || ev.metaKey){ state.teams.has(t.key) ? state.teams.delete(t.key) : state.teams.add(t.key); }
+      else { state.teams = (state.teams.size===1 && state.teams.has(t.key)) ? new Set() : new Set([t.key]); }
+      render();
+    });
+    tl.appendChild(b);
+  }
+  const fl = document.getElementById("funcList"); fl.innerHTML = "";
+  for(const f of FUNCS){
+    const b = el("button", "pill", FUNC_LABEL[f]); b.setAttribute("aria-pressed", state.funcs.has(f));
+    b.addEventListener("click", () => { state.funcs.has(f) ? state.funcs.delete(f) : state.funcs.add(f); render(); });
+    fl.appendChild(b);
+  }
+  const ty = document.getElementById("typeList"); ty.innerHTML = "";
+  for(const [k, label] of TYPES){
+    const b = el("button", "pill", `<i></i>${label}`); b.style.setProperty("--c", `var(--c-${k})`); b.setAttribute("aria-pressed", state.types.has(k));
+    b.addEventListener("click", ev => {
+      if(ev.altKey){ state.types = new Set([k]); }
+      else { state.types.has(k) ? state.types.delete(k) : state.types.add(k); }
+      render();
+    });
+    ty.appendChild(b);
+  }
+}
+function rosterText(key){
+  const r = ROSTER[key]; if(!r) return "";
+  return Object.entries(r).map(([k,v]) => `${k}: ${v.join(", ")}`).join("\n");
+}
+
+/* ---------- timeline ---------- */
+let range = null;
+function computeRange(list){
+  let min = list.length ? list[0].d : today, max = list.length ? list[list.length-1].d : today;
+  if(today < min) min = today; if(today > max) max = today;
+  const s = new Date(min); s.setDate(s.getDate() - ((s.getDay()+6)%7) - 7);
+  const e = new Date(max); e.setDate(e.getDate() + (7 - e.getDay()) + 14);
+  return {start:s, end:e, days:Math.round((e - s)/MS_DAY)};
+}
+const xOf = d => Math.round((d - range.start)/MS_DAY) * DAYW[state.zoom];
+
+function pack(arr, dayw, labelOn){
+  /* greedy sub-row packing so labels never overlap */
+  const rows = [];
+  for(const it of arr){
+    const w = it.range ? Math.max(it.rangeW, 24) : (labelOn(it) ? Math.min(it.text.split("\n")[0].length * 7 + 34, 250) : 18);
+    const x = xOf(it.d) - 8;
+    let r = 0; while(rows[r] != null && rows[r] > x) r++;
+    rows[r] = x + w + 6; it.sub = r;
+  }
+  return rows.length || 1;
+}
+function pairRanges(arr){
+  /* "…시작" followed by "…완료/마무리" in the same lane becomes a bar */
+  const used = new Set();
+  for(const a of arr){
+    if(!/시작/.test(a.text) || used.has(a.id)) continue;
+    const stem = norm(a.text.replace(/시작.*$/,"")).slice(0,8);
+    const b = arr.find(x => x.d > a.d && !used.has(x.id) && /(완료|마무리)/.test(x.text) && norm(x.text).startsWith(stem.slice(0,6)));
+    if(b){ a.range = b; a.rangeW = xOf(b.d) - xOf(a.d); used.add(a.id); used.add(b.id); b.rangeEnd = true; }
+  }
+}
+
+function renderTimeline(list, grouping){
+  const tl = document.getElementById("tl");
+  const keepX = tl.scrollLeft, keepY = tl.scrollTop, hadContent = tl.childElementCount > 0;
+  tl.innerHTML = "";
+  range = computeRange(list);
+  const dayw = DAYW[state.zoom], W = LW + range.days * dayw;
+  const canvas = el("div", "canvas"); canvas.style.width = W + "px"; canvas.style.setProperty("--lw", LW + "px");
+  const labelOn = it => state.zoom !== "month" || it.type==="tradeshow" || it.type==="convention" || it.common;
+
+  /* grid */
+  const grid = el("div", "grid");
+  for(let i=0;i<range.days;i++){
+    const d = new Date(range.start); d.setDate(d.getDate()+i);
+    if(d.getDay()===6){ const w = el("div","wk"); w.style.left = i*dayw+"px"; w.style.width = 2*dayw+"px"; grid.appendChild(w); }
+    if(d.getDate()===1){ const m = el("div","mo"); m.style.left = i*dayw+"px"; grid.appendChild(m); }
+  }
+  const tsDates = new Map();
+  for(const it of list) if(it.type==="tradeshow" && it.bold && !/review|리뷰/i.test(it.text)) tsDates.set(it.date, it);
+  for(const [ds, it] of tsDates){ const l = el("div","ts"); l.style.left = xOf(it.d)+"px"; grid.appendChild(l); }
+  const nowX = xOf(today);
+  if(today >= range.start && today <= range.end){ const n = el("div","now"); n.style.left = nowX+"px"; grid.appendChild(n); }
+  canvas.appendChild(grid);
+
+  /* header */
+  const head = el("div","head");
+  const corner = el("div","corner", `<span>${visibleTeams().length}개 팀 · ${list.length}건</span><b>${fmtFull(range.start)} – ${fmtFull(range.end)}</b>`);
+  head.appendChild(corner);
+  const hc = el("div","hcells");
+  let cur = null;
+  for(let i=0;i<=range.days;i++){
+    const d = new Date(range.start); d.setDate(d.getDate()+i);
+    if(d.getDate()===1 || i===0){
+      const m = el("div","hm"); m.style.left = i*dayw+"px";
+      const dim = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
+      const wdays = i===0 ? (dim - d.getDate() + 1) : dim;
+      m.style.width = (wdays*dayw)+"px";
+      m.innerHTML = `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,"0")}<small>${d.toLocaleString("en",{month:"short"})}</small>`;
+      hc.appendChild(m);
+    }
+    if(state.zoom==="day"){
+      const w = el("div","hw" + (d.getDay()===0||d.getDay()===6 ? " we":"")); w.style.left = i*dayw+"px"; w.style.width = dayw+"px"; w.textContent = d.getDate(); hc.appendChild(w);
+    } else if(d.getDay()===1){
+      const w = el("div","hw"); w.style.left = i*dayw+"px"; w.style.width = 7*dayw+"px"; w.textContent = state.zoom==="week" ? fmtD(d) : (d.getDate()<=7 ? fmtD(d) : ""); hc.appendChild(w);
+    }
+  }
+  for(const [ds, it] of tsDates){ const t = el("div","hts"); t.style.left = xOf(it.d)+"px"; t.innerHTML = `<span>${esc(it.text.replace(/^27(FW|S)\s*/,"").replace(/tradeshow/i,"TS").slice(0,18))}</span>`; hc.appendChild(t); }
+  if(today >= range.start && today <= range.end){ const n = el("div","hnow"); n.style.left = nowX+"px"; n.innerHTML = `<span>오늘 ${fmtD(today)}</span>`; hc.appendChild(n); }
+  head.appendChild(hc);
+  canvas.appendChild(head);
+
+  /* lanes */
+  const lanes = el("div","lanes");
+  const byTeam = {};
+  for(const it of list){ if(grouping.commonIds.has(it.id)) continue; (byTeam[it.team] ||= []).push(it); }
+
+  const addGroup = (key, name, sea, codes, rows, overview) => {
+    const g = el("div","grp" + (state.closed.has(key) ? " closed":""));
+    const total = rows.reduce((n,r)=>n+r.items.length,0);
+    g.innerHTML = `<div class="lab" title="${esc(rosterText(key))}"><span class="tw">▼</span><span class="n">${esc(name)}</span>${sea ? `<span class="sea">${sea}</span>`:""}<span class="k">${codes ? esc(codes)+" · " : ""}${total}</span></div><div class="ov"></div>`;
+    const ov = g.querySelector(".ov");
+    for(const it of overview){ const i = el("i"); i.style.left = xOf(it.d)+"px"; i.style.setProperty("--c",`var(--c-${it.type})`); if(it.type==="tradeshow"||it.type==="convention") i.classList.add("key"); ov.appendChild(i); }
+    g.querySelector(".lab").addEventListener("click", () => { state.closed.has(key) ? state.closed.delete(key) : state.closed.add(key); render(); });
+    lanes.appendChild(g);
+    if(state.closed.has(key)) return;
+    for(const r of rows){
+      const arr = r.items.slice(); pairRanges(arr);
+      const n = pack(arr.filter(a=>!a.rangeEnd), dayw, labelOn);
+      const lane = el("div","lane"); lane.style.height = (n*24 + 8) + "px";
+      lane.innerHTML = `<div class="lab${r.func==="Team" ? " team":""}"><span>${esc(r.label)}</span><span class="k">${r.items.length}</span></div><div class="trk"></div>`;
+      const trk = lane.querySelector(".trk");
+      /* merge same-date same-text duplicates inside a row (e.g. 2-day meetings render once per day; keep) */
+      for(const it of arr){
+        if(it.rangeEnd) continue;
+        const top = it.sub*24 + 4;
+        if(it.range){ const b = el("div","bar"); b.style.left = xOf(it.d)+"px"; b.style.width = Math.max(it.rangeW, 6)+"px"; b.style.top = (top-1)+"px"; b.style.setProperty("--c",`var(--c-${it.type})`); trk.appendChild(b); }
+        const m = el("div","ms" + (it.bold ? " b":"") + (labelOn(it) ? "" : " nolab") + (it.common ? " multi":"") + (state.dimPast && it.d < today ? " past":""));
+        m.style.left = (xOf(it.d) - 8) + "px"; m.style.top = top + "px"; m.style.setProperty("--c",`var(--c-${it.type})`);
+        if(state.dimPast && it.d < today) m.style.opacity = .45;
+        const label = it.range ? `${it.text.split("\n")[0]} → ${fmtD(it.range.d)}` : it.text.split("\n")[0];
+        m.innerHTML = `<i></i><span data-n="${it.n||""}">${esc(label)}</span>`;
+        m.addEventListener("mouseenter", ev => showPop(it, ev)); m.addEventListener("mousemove", movePop); m.addEventListener("mouseleave", hidePop);
+        m.addEventListener("click", ev => { showPop(it, ev); ev.stopPropagation(); });
+        trk.appendChild(m);
+      }
+      lanes.appendChild(lane);
+    }
+  };
+
+  for(const s of ["ss2","fw"]){
+    if(state.season !== "all" && state.season !== s) continue;
+    const cs = grouping.commons[s];
+    if(cs.length) addGroup("common-"+s, `${SEASON_LABEL[s]} 공통 마일스톤`, null, "전 팀", [{func:"Team", label:"전 팀 동일 일정", items:cs}], cs);
+    for(const t of visibleTeams().filter(t => SEASON_OF(t)===s)){
+      const arr = byTeam[t.key] || [];
+      if(!arr.length) continue;
+      const rows = FUNCS.map(f => ({func:f, label:FUNC_LABEL[f], items:arr.filter(a=>a.func===f)})).filter(r => r.items.length);
+      addGroup(t.key, t.name, state.season==="all" ? SEASON_LABEL[s] : null, t.codes, rows, arr);
+    }
+  }
+  if(!lanes.childElementCount) lanes.appendChild(el("div","empty","조건에 맞는 일정이 없습니다. 팀 · 기능 · 유형 필터를 확인하세요."));
+  canvas.appendChild(lanes);
+  tl.appendChild(canvas);
+  if(hadContent){ tl.scrollLeft = keepX; tl.scrollTop = keepY; } else scrollToDate(today, true);
+}
+function scrollToDate(d, silent){
+  if(state.view !== "tl"){ state.view = "tl"; render(); }
+  const tl = document.getElementById("tl");
+  tl.scrollTo({left:Math.max(0, xOf(d) - Math.round((tl.clientWidth - LW)/3)), behavior: silent ? "auto" : "smooth"});
+}
+
+/* popup */
+const pop = document.getElementById("pop");
+function showPop(it, ev){
+  const t = teamsByKey[it.team];
+  const same = items.filter(x => x.date===it.date && norm(x.text)===norm(it.text)).map(x=>x.team);
+  const tset = [...new Set(it.teamsIn || same)];
+  pop.style.setProperty("--c", `var(--c-${it.type})`);
+  pop.innerHTML = `<div class="pd"><span>${fmtFull(it.d)}</span><b>${dday(it.d)}</b>${it.range ? `<span>→ ${fmtFull(it.range.d)} · ${Math.round((it.range.d-it.d)/MS_DAY)}일</span>`:""}</div>
+    <div class="pt">${esc(it.text)}${it.range ? "\n" + esc(it.range.text) : ""}</div>
+    <div class="pm"><span><i></i>${TYPE_LABEL[it.type]}</span><span>${SEASON_LABEL[SEASON_OF(t)]}</span><span>${esc(it.common ? "공통" : t.name)} · ${FUNC_LABEL[it.func]}</span></div>
+    ${tset.length > 1 ? `<div class="teams">같은 날 동일 일정 ${tset.length}개 팀: ${tset.map(k=>esc(teamsByKey[k].name)).join(", ")}</div>` : ""}`;
+  pop.classList.add("on"); movePop(ev);
+}
+function movePop(ev){
+  const w = pop.offsetWidth, h = pop.offsetHeight;
+  let x = ev.clientX + 14, y = ev.clientY + 14;
+  if(x + w > innerWidth - 8) x = ev.clientX - w - 14;
+  if(y + h > innerHeight - 8) y = ev.clientY - h - 14;
+  pop.style.left = x+"px"; pop.style.top = y+"px";
+}
+function hidePop(){ pop.classList.remove("on"); }
+document.addEventListener("click", hidePop);
+
+/* ---------- list view ---------- */
+function renderList(list, grouping){
+  const box = document.getElementById("list"); box.innerHTML = "";
+  if(!list.length){ box.appendChild(el("div","empty","조건에 맞는 일정이 없습니다.")); return; }
+  const rows = [];
+  const byKey = {};
+  for(const it of list){
+    if(grouping.commonIds.has(it.id)){ const k = SEASON_OF(teamsByKey[it.team]) + it.date + norm(it.text); if(byKey[k]) continue; const c = grouping.commons[SEASON_OF(teamsByKey[it.team])].find(c => c.date===it.date && norm(c.text)===norm(it.text)); byKey[k] = 1; rows.push(c); }
+    else rows.push(it);
+  }
+  rows.sort((a,b)=>a.d-b.d);
+  let html = `<table><thead><tr><th>날짜</th><th>D-day</th><th>시즌</th><th>팀</th><th>기능</th><th>유형</th><th>일정</th></tr></thead><tbody>`;
+  let month = "";
+  for(const it of rows){
+    const m = `${it.d.getFullYear()}.${String(it.d.getMonth()+1).padStart(2,"0")}`;
+    if(m !== month){ month = m; html += `<tr class="mh"><td colspan="7">${m}</td></tr>`; }
+    const t = teamsByKey[it.team], n = Math.round((it.d - today)/MS_DAY);
+    const we = it.d.getDay()===0||it.d.getDay()===6;
+    html += `<tr class="${n<0 ? "past" : n===0 ? "today" : ""}"><td class="dt${we?" we":""}">${fmtFull(it.d)}</td><td class="dd${n>=0&&n<=14?" soon":""}">${dday(it.d)}</td><td class="fn">${SEASON_LABEL[SEASON_OF(t)]}</td>
+      <td class="tm">${it.common ? `전 팀 공통 <span style="font-family:var(--fm);font-weight:400;color:var(--ink-3)">×${it.n}</span>` : esc(t.name)}</td><td class="fn">${FUNC_LABEL[it.func]}</td>
+      <td><span class="ty" style="--c:var(--c-${it.type})"><i></i>${TYPE_LABEL[it.type]}</span></td><td class="tx${it.bold?" b":""}">${esc(it.text)}</td></tr>`;
+  }
+  html += "</tbody></table>";
+  box.innerHTML = html;
+}
+
+/* ---------- render ---------- */
+function render(){
+  document.querySelectorAll("#seasonSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v===state.season));
+  document.querySelectorAll("#viewSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v===state.view));
+  document.querySelectorAll("#zoomSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v===state.zoom));
+  const list = filtered();
+  const grouping = groupCommon(list);
+  renderKpis(list); renderSide(list);
+  document.getElementById("tl").hidden = state.view !== "tl";
+  document.getElementById("list").hidden = state.view !== "list";
+  if(state.view==="tl") renderTimeline(list, grouping); else renderList(list, grouping);
+  const up = list.filter(i => i.d >= today).length;
+  document.getElementById("foot").innerHTML = `<span><b>${list.length}</b>건 표시 · 예정 <b>${up}</b> · 지난 <b>${list.length-up}</b></span><span>기준일 <b>${fmtFull(today)}</b></span><span>출처 <b>MLB GTM Calendar_27.xlsx › 27F_team</b></span><span>팀 클릭 = 단일 팀 · Shift+클릭 = 다중 선택 · Alt+유형 = 단독 보기</span>`;
+  persist();
+}
+
+document.getElementById("seasonSeg").addEventListener("click", e => { const b = e.target.closest("button"); if(!b) return; state.season = b.dataset.v; state.teams.clear(); state.closed.clear(); render(); });
+document.getElementById("viewSeg").addEventListener("click", e => { const b = e.target.closest("button"); if(!b) return; state.view = b.dataset.v; render(); });
+document.getElementById("zoomSeg").addEventListener("click", e => { const b = e.target.closest("button"); if(!b) return; state.zoom = b.dataset.v; render(); scrollToDate(today, true); });
+document.getElementById("todayBtn").addEventListener("click", () => scrollToDate(today));
+document.getElementById("printBtn").addEventListener("click", () => { if(state.view!=="list"){ state.view="list"; render(); } setTimeout(()=>window.print(), 100); });
+document.getElementById("teamAll").addEventListener("click", () => { state.teams.clear(); render(); });
+document.getElementById("typeAll").addEventListener("click", () => { state.types = new Set(TYPES.map(t=>t[0])); render(); });
+document.getElementById("optCommon").addEventListener("change", e => { state.common = e.target.checked; render(); });
+document.getElementById("optPast").addEventListener("change", e => { state.dimPast = e.target.checked; render(); });
+let qt; document.getElementById("q").addEventListener("input", e => { clearTimeout(qt); qt = setTimeout(() => { state.q = e.target.value; render(); }, 150); });
+document.getElementById("optCommon").checked = state.common;
+render();
+</script>

@@ -1,0 +1,16 @@
+# Local working files that must not be published
+/.claude/
+/_build/
+/_server_*.log
+/PROJECT_MEMORY.md
+/미팅전사문.txt
+
+# Editable local source copies; GitHub Pages publishes /docs
+/TMD_Architecture.html
+/TMD_Mockup.html
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+desktop.ini
+
