@@ -16,6 +16,8 @@ https://pilgukang0704.github.io/ttmddash/
   - 저장소와 사이트에는 암호문만 올라가고, 비밀번호 창에서 입력해야 브라우저 안에서 열립니다.
   - "이 기기에서 30일간 기억"을 켜면 다른 페이지도 다시 묻지 않습니다.
 - 트렌드는 용량(암호화하면 100MB 초과) 때문에 자체 공개 사이트 `pilgukang0704.github.io/Trenddashboard/`로 연결합니다.
+- 카테고리 분석은 매주 Cloudflare Pages에 자동 배포되는 `mlbcategoryanalysis.pages.dev`로 연결합니다(사본 없음, 2026-10-01).
+- 브랜드는 첫 화면이 브랜드 인덱스(`dashboards/brand-index.html`)이고, 카드를 누르면 `dashboards/brand.html?brand=…`로 열립니다. 원본은 Brand_crawling의 `export_single_html_portal.py --split-out` 출력입니다(2026-10-02).
 - `docs/robots.txt`와 noindex 메타로 검색엔진 수집을 막습니다.
 
 `docs/`는 직접 고치지 않습니다. `_build/build.py` → `_build/publish_docs.py` 순서로 다시 만듭니다.
