@@ -19,3 +19,8 @@ desktop.ini
 
 # MLB DNA (chairman meeting analysis) - internal only
 /DNA/
+
+# Other teams source materials (plaintext) - published encrypted via publish_docs
+/Other_Teams/
+/TMD_Presentation_KO_v2.html
+/TMD_Presentation_EN_v2.html
